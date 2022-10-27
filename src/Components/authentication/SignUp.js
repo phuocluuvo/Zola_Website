@@ -56,13 +56,10 @@ function SignUp({ setShow }) {
       data.append("file", pics);
       data.append("upload_preset", "chat-chit");
       data.append("cloud_name", "voluu");
-      fetch(
-        "https:/https://zolachatapp.herokuapp.com/api.cloudinary.com/v1_1/voluu/image/upload",
-        {
-          method: "POST",
-          body: data,
-        }
-      )
+      fetch("https://api.cloudinary.com/v1_1/voluu/image/upload", {
+        method: "POST",
+        body: data,
+      })
         .then((res) => res.json())
         .then((data) => {
           setPic(data.url.toString());

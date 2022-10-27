@@ -217,25 +217,11 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
         }
       } else {
         setMessages([...messages, newMessageRecieved]);
+        setFetchAgain(!fetchAgain);
       }
     });
   });
-  useEffect(() => {
-    socket.on("message recieved", (newMessageRecieved) => {
-      if (
-        !selectedChatCompare ||
-        selectedChatCompare._id !== newMessageRecieved.chat._id
-      ) {
-        //notification
-        if (!notification.includes(newMessageRecieved)) {
-          setNotification([newMessageRecieved, ...notification]);
-          setFetchAgain(!fetchAgain);
-        }
-      } else {
-        setMessages([...messages, newMessageRecieved]);
-      }
-    });
-  }, []);
+
   return (
     <Box
       w="full"
