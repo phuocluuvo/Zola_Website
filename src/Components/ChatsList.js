@@ -68,7 +68,10 @@ function ChatList({ fetchAgain, setFetchAgain }) {
             }}
             onClick={() => {
               selectedChat
-                ? io("http://localhost:5000").emit("outchat", selectedChat._id)
+                ? io("https://zolachatapp.herokuapp.com/").emit(
+                    "outchat",
+                    selectedChat._id
+                  )
                 : console.log("out out out");
               setSelectedChat(chat);
             }}
