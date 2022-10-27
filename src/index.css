@@ -1,0 +1,100 @@
+@import url("https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;700&display=swap");
+body {
+  padding: 0;
+  margin: 0;
+  font-family: "Jaldi", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
+    monospace;
+}
+
+/* Cirle animation*/
+#square1 {
+  position: absolute;
+  width: 700px;
+  height: 700px;
+  right: -250px;
+  top: -150px;
+  z-index: 1;
+  /* Linear Orange Red */
+
+  background: linear-gradient(180deg, #ff1f00 0%, #fff500 100%);
+  transform: rotate(-45deg);
+}
+
+/* Cirle animation*/
+#square2 {
+  position: absolute;
+  width: 700px;
+  height: 700px;
+  right: -250px;
+  top: 200px;
+
+  /* Linear Light Teal Light Mode */
+
+  background: linear-gradient(180deg, #ffffff 0%, #d2dbe2 50.57%, #b1aec6 100%);
+  transform: rotate(-45deg);
+}
+#picture_login {
+  position: absolute;
+  width: 400px;
+  height: 100%;
+  right: 0;
+  background-repeat: no-repeat;
+  top: 25%;
+  bottom: 0;
+  z-index: 2;
+  background-image: url(./asset/woman.png);
+  scale: 1.4;
+  @media (min-width: 640px) {
+    scale: 1 !important;
+  }
+}
+#bgChatZone {
+  background: url(./asset/userTest.png);
+}
+
+:root {
+  --mouseX8: 0;
+  --mouseY8: 0;
+  --padding: 1em;
+}
+.card {
+  position: relative;
+  max-width: 100%;
+  margin: 2rem auto;
+  padding: 2em;
+}
+
+.card--8 {
+  position: relative;
+}
+.card--8::before {
+  display: block;
+  position: absolute;
+  top: calc(var(--padding) * -1);
+  bottom: calc(var(--padding) * -1);
+  left: calc(var(--padding) * -1);
+  right: calc(var(--padding) * -1);
+  content: " ";
+  margin: auto;
+  width: 105%;
+  height: 110%;
+  z-index: -1;
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  background-color: rgba(17, 25, 40, 0.4);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.125);
+  transition-duration: 0.25s;
+  transform: perspective(700px) rotateX(calc(var(--mouseY8) * -1deg))
+    rotateY(calc(var(--mouseX8) * 1deg));
+}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
