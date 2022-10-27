@@ -146,7 +146,6 @@ function SignIn({ setShow, isOpen }) {
       const config = {
         headers: {
           "Content-type": "application/json",
-          "Access-Control-Allow-Origin": "https://zolachatapp.herokuapp.com/",
         },
       };
 
