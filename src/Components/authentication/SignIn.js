@@ -70,7 +70,7 @@ function SignIn({ setShow, isOpen }) {
 
       const use = await axios
         .post(
-          "/api/user/:email",
+          "https://zolachatapp.herokuapp.com/api/user/:email",
           {
             email: user.email,
           },
@@ -80,7 +80,7 @@ function SignIn({ setShow, isOpen }) {
 
       if (use.data === "a") {
         const { data } = await axios.post(
-          "/api/user",
+          "https://zolachatapp.herokuapp.com/api/user",
           {
             username: user.displayName,
             fullname: user.displayName,
@@ -103,7 +103,7 @@ function SignIn({ setShow, isOpen }) {
         });
       } else if (use) {
         const { data } = await axios.post(
-          "/api/user/login",
+          "https://zolachatapp.herokuapp.com/api/user/login",
           {
             email: user.email,
             password: user.uid,
@@ -150,12 +150,12 @@ function SignIn({ setShow, isOpen }) {
       };
 
       const { data } = await axios.post(
-        "/api/user/login",
+        "https://zolachatapp.herokuapp.com/api/user/login",
         { email, password },
         config
       );
       const verify = await axios.post(
-        "/api/user/:email",
+        "https://zolachatapp.herokuapp.com/api/user/:email",
         {
           email: email,
         },

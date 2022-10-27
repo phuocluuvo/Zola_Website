@@ -84,7 +84,12 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
       };
       setLoading(true);
       await axios
-        .get(`/api/message/${selectedChat._id}/${1}`, config)
+        .get(
+          `https://zolachatapp.herokuapp.com/api/message/${
+            selectedChat._id
+          }/${1}`,
+          config
+        )
         .then((data) => setMessages(data.data));
       setLoading(false);
 
@@ -121,7 +126,7 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
         setNewMessage("");
         await axios
           .post(
-            "/api/message",
+            "https://zolachatapp.herokuapp.com/api/message",
             {
               content: newMessage,
               chatId: selectedChat._id,

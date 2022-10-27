@@ -56,10 +56,13 @@ function SignUp({ setShow }) {
       data.append("file", pics);
       data.append("upload_preset", "chat-chit");
       data.append("cloud_name", "voluu");
-      fetch("https://api.cloudinary.com/v1_1/voluu/image/upload", {
-        method: "POST",
-        body: data,
-      })
+      fetch(
+        "https:/https://zolachatapp.herokuapp.com/api.cloudinary.com/v1_1/voluu/image/upload",
+        {
+          method: "POST",
+          body: data,
+        }
+      )
         .then((res) => res.json())
         .then((data) => {
           setPic(data.url.toString());
@@ -113,7 +116,7 @@ function SignUp({ setShow }) {
       };
 
       const { data } = await axios.post(
-        "/api/user",
+        "https://zolachatapp.herokuapp.com/api/user",
         { username, fullname, email, password, pic },
         config
       );
@@ -152,7 +155,7 @@ function SignUp({ setShow }) {
 
     await axios
       .post(
-        "/api/user/:email",
+        "https://zolachatapp.herokuapp.com/api/user/:email",
         {
           email: email,
         },
@@ -160,7 +163,10 @@ function SignUp({ setShow }) {
       )
       .then((data) => {
         axios
-          .post("/api/user/verify", { userId: data.data._id, otp: OTP.otp })
+          .post("https://zolachatapp.herokuapp.com/api/user/verify", {
+            userId: data.data._id,
+            otp: OTP.otp,
+          })
           .then((data1) => {
             console.log(data);
             localStorage.setItem("userInfo", JSON.stringify(data));

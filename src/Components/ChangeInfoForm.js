@@ -82,7 +82,7 @@ function ChangeInfoForm({ userUpdate }) {
 
       await axios
         .put(
-          "/api/user/update/",
+          "https://zolachatapp.herokuapp.com/api/user/update/",
           {
             _id: values._id,
             fullname: values.fullname,

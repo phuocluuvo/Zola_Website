@@ -45,7 +45,10 @@ function GroupChatModal({ children }) {
         cancelToken: source.token,
       };
 
-      const { data } = await axios.get(`/api/user?search=${search}`, config);
+      const { data } = await axios.get(
+        `https://zolachatapp.herokuapp.com/api/user?search=${search}`,
+        config
+      );
       console.log(data);
       setSearchResult(data);
       setLoading(false);
@@ -85,7 +88,7 @@ function GroupChatModal({ children }) {
       };
 
       const { data } = await axios.post(
-        `/api/chat/group`,
+        `https://zolachatapp.herokuapp.com/api/chat/group`,
         {
           name: groupChatName,
           users: JSON.stringify(selectedUsers.map((u) => u._id)),

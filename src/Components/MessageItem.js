@@ -44,7 +44,7 @@ function MessageItem({ messages, setMessages, m, i }) {
         cancelToken: source.token,
       };
       const { data } = await axios.get(
-        `/api/message/${selectedChat._id}`,
+        `https://zolachatapp.herokuapp.com/api/message/${selectedChat._id}`,
         config
       );
       setMessages(data);
@@ -77,7 +77,7 @@ function MessageItem({ messages, setMessages, m, i }) {
 
       await axios
         .put(
-          "/api/message/delete",
+          "https://zolachatapp.herokuapp.com/api/message/delete",
           {
             messageId: messageId,
           },

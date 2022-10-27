@@ -32,7 +32,10 @@ function ChatList({ fetchAgain, setFetchAgain }) {
         },
         cancelToken: source.token,
       };
-      const { data } = await axios.get(`/api/chat`, config);
+      const { data } = await axios.get(
+        `https://zolachatapp.herokuapp.com/api/chat`,
+        config
+      );
       if (user) setChats(data);
     } catch (error) {
       if (axios.isCancel(error)) console.log("successfully aborted");

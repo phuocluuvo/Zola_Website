@@ -15,13 +15,16 @@ export default function useMessagePagination(user, chat, pageNumber) {
       setError(false);
 
       await axios
-        .get(`/api/message/${chat._id}/${pageNumber}`, {
-          headers: {
-            "Content-type": "application/json",
-            Authorization: `Bearer ${user.token}`,
-          },
-          cancelToken: source.CancelToken,
-        })
+        .get(
+          `https://zolachatapp.herokuapp.com/api/message/${chat._id}/${pageNumber}`,
+          {
+            headers: {
+              "Content-type": "application/json",
+              Authorization: `Bearer ${user.token}`,
+            },
+            cancelToken: source.CancelToken,
+          }
+        )
         .then((res) => {
           setMessages([...new Set([...res.data, ...messages])]);
           setHasMore(res.data.length > 0);

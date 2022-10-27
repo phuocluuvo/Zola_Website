@@ -56,7 +56,7 @@ function UpdateGroupChatModal({
       };
 
       const { data } = await axios.put(
-        `/api/chat/groupremove`,
+        `https://zolachatapp.herokuapp.com/api/chat/groupremove`,
         {
           chatId: selectedChat._id,
           userId: u._id,
@@ -124,7 +124,10 @@ function UpdateGroupChatModal({
         },
       };
 
-      const { data } = await axios.get(`/api/user?search=${search}`, config);
+      const { data } = await axios.get(
+        `https://zolachatapp.herokuapp.com/api/user?search=${search}`,
+        config
+      );
 
       setSearchResult(data);
       setLoading(false);
@@ -172,7 +175,7 @@ function UpdateGroupChatModal({
       };
 
       const { data } = await axios.put(
-        `/api/chat/groupadd`,
+        `https://zolachatapp.herokuapp.com/api/chat/groupadd`,
         {
           chatId: selectedChat._id,
           userId: u._id,
