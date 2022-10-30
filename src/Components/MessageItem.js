@@ -201,7 +201,10 @@ function MessageItem({ messages, setMessages, m, i }) {
           {m?.multiMedia && (
             <Image
               borderRadius={"md"}
-              boxSize={"sm"}
+              maxWidth="300px"
+              maxHeight="450px"
+              w="fit-content"
+              h="fit-content"
               objectFit="cover"
               src={m?.multiMedia}
             />
