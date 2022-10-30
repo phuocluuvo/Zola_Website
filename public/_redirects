@@ -1,2 +1,2 @@
-/*  /chats
-/*  /call/:caller
+https://zolachatapp.netlify.app/*    https://zolachatapp.netlify.app/chats  200
+https://zolachatapp.netlify.app/*   https://zolachatapp.netlify.app/call/* 201
