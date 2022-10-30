@@ -35,8 +35,10 @@ function MessageList({
           <Box ref={lastMessageElementRef}>
             <MessageItem key={i} messages={messages} m={m} i={i} />
           </Box>
-        ) : (
+        ) : m._id !== 0 ? (
           <MessageItem messages={messages} m={m} i={i} key={i} />
+        ) : (
+          <></>
         )
       )}
     </ScrollableFeed>

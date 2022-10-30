@@ -19,7 +19,7 @@ import {
 } from "@chakra-ui/react";
 import axios from "axios";
 import moment from "moment";
-import React, { memo, useEffect, useState } from "react";
+import React, { memo, useState } from "react";
 import {
   isLastMessage,
   isSameSender,
@@ -54,7 +54,7 @@ function MessageItem({ messages, setMessages, m, i }) {
       else
         toast({
           title: "Error Occured",
-          description: "Failed to send message",
+          description: "Failed to load message",
           status: "warning",
           duration: 2500,
           isClosable: true,
@@ -146,7 +146,7 @@ function MessageItem({ messages, setMessages, m, i }) {
           backgroundColor={`${
             m.sender._id === user._id ? "#BEE3F8" : "whiteAlpha.900"
           }`}
-          padding="10px"
+          padding={m?.content ? "10px" : 0}
           marginLeft={isSameSenderMargin(messages, m, i, user._id)}
           marginTop={isSameUserMargin(messages, m, i, user._id) ? "auto" : 30}
           position={"relative"}
@@ -177,12 +177,15 @@ function MessageItem({ messages, setMessages, m, i }) {
                 >
                   {m.response?.content}
                 </Text>
-                {m.response?.multiMedia && (
+                {m?.multiMedia && (
                   <Image
-                    borderRadius={"sm"}
-                    boxSize="100px"
+                    borderRadius={"md"}
+                    maxWidth="300px"
+                    maxHeight="450px"
+                    w="fit-content"
+                    h="fit-content"
                     objectFit="cover"
-                    src={m.response?.multiMedia}
+                    src={m?.multiMedia}
                   />
                 )}
               </Box>

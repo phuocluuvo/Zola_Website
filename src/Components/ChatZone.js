@@ -52,7 +52,7 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
     "linear(to-b,whiteAlpha.900,#B1AEC6)",
     "linear(to-b,#1E2B6F,#193F5F)"
   );
-
+  const [loadingNewMessage, setLoadingNewMessage] = useState(false);
   const [loading, setLoading] = useState(false);
   const [newMessage, setNewMessage] = useState("");
   const [socketConnected, setSocketConnected] = useState(false);
@@ -152,6 +152,9 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
       if (user) socket.emit("stop typing", selectedChat._id);
       inputRef.current.value = null;
       try {
+        setLoadingNewMessage(true);
+        let messageList = messages;
+        setMessages([...messages, { _id: 0 }]);
         const config = {
           headers: {
             "Content-type": "application/json",
@@ -159,19 +162,24 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
           },
         };
         setNewMessage("");
-        const { data } = await axios.post(
-          "https://zolachatapp.herokuapp.com/api/message",
-          {
-            multiMedia: pic,
-            content: newMessage,
-            chatId: selectedChat._id,
-            response: response,
-          },
-          config
-        );
+        const { data } = await axios
+          .post(
+            "https://zolachatapp.herokuapp.com/api/message",
+            {
+              multiMedia: pic,
+              content: newMessage,
+              chatId: selectedChat._id,
+              response: response,
+            },
+            config
+          )
+          .then((data) => {
+            setLoadingNewMessage(false);
+            setMessages([...messageList, data]);
+          });
         setPic("");
         socket.emit("new message", data);
-        console.log(data);
+        setResponse(null);
         setMessages([...messages, data]);
         setFetchAgain(!fetchAgain);
       } catch (error) {
@@ -206,7 +214,30 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
       }
     }, timerLength);
   };
-
+  const callMess = () => {
+    const config = {
+      headers: {
+        "Content-type": "application/json",
+        Authorization: `Bearer ${user.token}`,
+      },
+    };
+    setNewMessage("");
+    axios
+      .post(
+        "https://zolachatapp.herokuapp.com/api/message",
+        {
+          content: "📞📞📞📞",
+          chatId: selectedChat._id,
+        },
+        config
+      )
+      .then((data) => {
+        socket.emit("call", data.data);
+        setResponse(null);
+        setMessages([...messages, data.data]);
+        setFetchAgain(!fetchAgain);
+      });
+  };
   useEffect(() => {
     socket = io(ENDPOINT);
     if (user) {
@@ -249,22 +280,18 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
       }
     });
   });
+
   useEffect(() => {
-    socket.on("message recieved", (newMessageRecieved) => {
-      if (
-        !selectedChatCompare ||
-        selectedChatCompare._id !== newMessageRecieved.chat._id
-      ) {
-        //notification
-        if (!notification.includes(newMessageRecieved)) {
-          setNotification([newMessageRecieved, ...notification]);
-          setFetchAgain(!fetchAgain);
-        }
-      } else {
-        setMessages([...messages, newMessageRecieved]);
-      }
+    console.log("");
+    socket.on("answer", (answer) => {
+      const win = window.open(
+        "https://zolachatapp.herokuapp.com/call/" + answer,
+        "Call",
+        "toolbar=yes,scrollbars=yes,resizable=yes,top=50,left=70,width=1200,height=600"
+      );
     });
   }, []);
+
   return (
     <Box
       w="full"
@@ -452,6 +479,14 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                   alignItems={"center"}
                 >
                   <IconButton
+                    onClick={() => {
+                      window.open(
+                        "https://zolachatapp.herokuapp.com/call/null",
+                        "Call Video",
+                        "toolbar=yes,scrollbars=yes,resizable=yes,top=50,left=70,width=1200,height=600"
+                      );
+                      callMess();
+                    }}
                     variant={"ghost"}
                     className="transition-opacity"
                     borderRadius="full"
@@ -611,6 +646,7 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                         top={-10}
                         right={10}
                         p={2}
+                        pr={10}
                         borderTopRadius={"xl"}
                       >
                         <Box color={"white.500"} display="flex">
@@ -622,6 +658,15 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                           <Text className="truncate" maxW={"200px"} mx={1}>
                             {response?.content}
                           </Text>
+                          <IconButton
+                            pos="absolute"
+                            zIndex={10}
+                            top={0}
+                            right={0}
+                            bg="none"
+                            icon={<CloseIcon />}
+                            onClick={() => setResponse(null)}
+                          ></IconButton>
                         </Box>
                       </Box>
                     )}
@@ -657,21 +702,25 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                         isOpen={loadingPic}
                       >
                         <label htmlFor="icon-button-file">
-                          <Button
+                          <Text
                             as="span"
-                            variant={"outline"}
-                            bg="blue.800"
-                            p="0"
-                            borderRadius={"full"}
+                            className={`shadow-md
+                            ${
+                              colorMode === "light"
+                                ? "text-darkblue bg-gradient-to-bl from-whiteAlpha.900 to-[#B1AEC6]"
+                                : "text-whiteAlpha.900 bg-gradient-to-tr from-[#1E2B6F] to-[#193F5F]"
+                            }   rounded-full text-3xl w-8 h-fit hover:bg-opacity-50`}
+                            cursor={"pointer"}
                           >
                             <i
                               class="text-2xl text-white fa fa-camera"
                               aria-hidden="true"
                             ></i>
-                          </Button>
+                          </Text>
                         </label>
                       </Tooltip>
                       <Text
+                        cursor={"pointer"}
                         className={`shadow-md
                       ${
                         colorMode === "light"
@@ -685,6 +734,7 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                       </Text>
 
                       <Text
+                        cursor={"pointer"}
                         className={`shadow-md
                       ${
                         colorMode === "light"
