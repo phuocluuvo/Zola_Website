@@ -1,5 +1,6 @@
 import {
   ChevronLeftIcon,
+  CloseIcon,
   MoonIcon,
   PhoneIcon,
   SunIcon,
@@ -9,14 +10,17 @@ import {
   AvatarBadge,
   AvatarGroup,
   Box,
+  Button,
   Fade,
   FormControl,
   IconButton,
+  Image,
   Input,
   InputGroup,
   InputRightElement,
   Spinner,
   Text,
+  Tooltip,
   useColorMode,
   useColorModeValue,
   useDisclosure,
@@ -74,6 +78,7 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
     useMessagePagination(user, selectedChat, pageNumber);
   const [toggle, setToggle] = useState(false);
   const [pic, setPic] = useState("");
+  const [loadingPic, setLoadingPic] = useState(false);
   const fetchMessages = async () => {
     if (!selectedChat) return;
     const CancelToken = axios.CancelToken;
@@ -121,6 +126,7 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
       return;
     }
     if (picture) {
+      setLoadingPic(true);
       const data = new FormData();
       console.log(data);
       data.append("file", picture);
@@ -133,12 +139,11 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
         .then((res) => res.json())
         .then((data) => {
           setPic(data.url.toString());
-          console.log("STRING");
-          console.log(data.url.toString());
-          setLoading(false);
+          setLoadingPic(false);
         })
         .catch((err) => {
-          setLoading(false);
+          console.log(err);
+          setLoadingPic(false);
         });
     }
   };
@@ -572,6 +577,31 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                       theme={colorMode ? Theme.DARK : Theme.LIGHT}
                     />
                   </Box>
+                  {pic && (
+                    <>
+                      <Image
+                        pos="absolute"
+                        bottom={28}
+                        right={5}
+                        borderRadius="sm"
+                        border="1px solid white"
+                        maxH="100px"
+                        maxW="100px"
+                        w="fit-content"
+                        h="fit-content"
+                        objectFit="cover"
+                        src={pic}
+                      />
+                      <IconButton
+                        pos="absolute"
+                        bottom={28}
+                        right={5}
+                        rounded="full"
+                        icon={<CloseIcon />}
+                        onClick={() => setPic("")}
+                      ></IconButton>
+                    </>
+                  )}
                   <InputGroup size="lg" marginY={4}>
                     {response && (
                       <Box
@@ -609,15 +639,38 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                       }}
                     />
                     <InputRightElement
-                      width="5.5rem"
+                      width="9rem"
                       justifyContent={"space-around"}
                     >
                       <Input
-                        size="sm"
+                        accept="image/*"
+                        id="icon-button-file"
+                        type="file"
+                        className="hidden"
                         ref={inputRef}
                         onChange={selectChange}
-                        type="file"
-                      ></Input>
+                      />
+                      <Tooltip
+                        label={
+                          !loadingPic ? "Attach an image" : "Uploading an image"
+                        }
+                        isOpen={loadingPic}
+                      >
+                        <label htmlFor="icon-button-file">
+                          <Button
+                            as="span"
+                            variant={"outline"}
+                            bg="blue.800"
+                            p="0"
+                            borderRadius={"full"}
+                          >
+                            <i
+                              class="text-2xl text-white fa fa-camera"
+                              aria-hidden="true"
+                            ></i>
+                          </Button>
+                        </label>
+                      </Tooltip>
                       <Text
                         className={`shadow-md
                       ${
