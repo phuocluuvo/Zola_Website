@@ -148,7 +148,7 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
     }
   };
   const sendMessage = async (event) => {
-    if ((event.key === "Enter" || event === "Send") && newMessage) {
+    if ((event.key === "Enter" || event === "Send") && (newMessage || pic)) {
       if (user) socket.emit("stop typing", selectedChat._id);
       inputRef.current.value = null;
       try {
