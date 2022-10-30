@@ -1,5 +1,5 @@
 import { Box } from "@chakra-ui/react";
-import React, { memo, useCallback, useRef, useState } from "react";
+import React, { useCallback, useRef } from "react";
 import ScrollableFeed from "react-scrollable-feed";
 
 import MessageItem from "./MessageItem";

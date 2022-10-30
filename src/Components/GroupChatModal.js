@@ -1,4 +1,5 @@
 import {
+  Avatar,
   Box,
   Button,
   FormControl,
@@ -17,7 +18,6 @@ import {
 import axios from "axios";
 import React, { memo, useState } from "react";
 import { ChatState } from "../providers/ChatProvider";
-import UserBadgeItem from "./UserBadgeItem";
 import UserListItem from "./UserListItem";
 
 function GroupChatModal({ children }) {
@@ -175,11 +175,25 @@ function GroupChatModal({ children }) {
             </FormControl>
             <Box style={{ display: "flex", flexWrap: "wrap" }} w="100%">
               {selectedUsers.map((u) => (
-                <UserBadgeItem
+                <Box
+                  border={"1px solid white"}
+                  borderRadius="md"
+                  _hover={{ bg: "red" }}
+                  className="transition-colors"
+                  py="1"
+                  px="2"
+                  m={1}
+                  ml={0}
                   key={u._id}
-                  user={u}
-                  handleFunction={() => handleRemove(u)}
-                />
+                  display="flex"
+                  justifyContent={"center"}
+                  alignItems="center"
+                  onClick={() => handleRemove(u)}
+                  cursor="pointer"
+                >
+                  <Avatar size="xs" src={u.pic} />
+                  <Text>@{u.username}</Text>
+                </Box>
               ))}
             </Box>
             {loading ? (

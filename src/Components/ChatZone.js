@@ -24,6 +24,7 @@ import {
 } from "@chakra-ui/react";
 import EmojiPicker, { Theme } from "emoji-picker-react";
 import axios from "axios";
+import Lottie from "react-lottie";
 import io from "socket.io-client";
 import React, { useEffect, useRef, useState } from "react";
 import { getSender, getSenderInfo } from "../logic/ChatLogic";
@@ -35,8 +36,10 @@ import UpdateGroupChatModal from "./UpdateGroupChatModal";
 import ProfileModal from "./ProfileModal";
 import moment from "moment";
 import useMessagePagination from "../hooks/useMessagePagination";
+import DrawerInfoChat from "./DrawerInfoChat";
+import DrawerInfoUser from "./DrawerInfoUser";
 
-const ENDPOINT = "https://zolachatapp.herokuapp.com/";
+const ENDPOINT = "http://localhost:5000";
 
 let socket, selectedChatCompare;
 function ChatZone({ fetchAgain, setFetchAgain }) {
@@ -70,7 +73,7 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
   const { messages, setMessages, hasMore, loadingMessage, error } =
     useMessagePagination(user, selectedChat, pageNumber);
   const [toggle, setToggle] = useState(false);
-
+  const [pic, setPic] = useState("");
   const fetchMessages = async () => {
     if (!selectedChat) return;
     const CancelToken = axios.CancelToken;
@@ -99,8 +102,8 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
       else
         toast({
           title: "Error Occured",
-          description: "Failed to send message",
-          status: "warning",
+          description: "Failed to load message",
+          status: "error",
           duration: 2500,
           isClosable: true,
           position: "bottom",
@@ -111,11 +114,38 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
       source.cancel();
     };
   };
+  const inputRef = useRef(null);
+  const selectChange = (event) => {
+    const picture = event.target.files && event.target.files[0];
+    if (!picture) {
+      return;
+    }
+    if (picture) {
+      const data = new FormData();
+      console.log(data);
+      data.append("file", picture);
+      data.append("upload_preset", "chat-chit");
+      data.append("cloud_name", "voluu");
+      fetch("https://api.cloudinary.com/v1_1/voluu/image/upload", {
+        method: "POST",
+        body: data,
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          setPic(data.url.toString());
+          console.log("STRING");
+          console.log(data.url.toString());
+          setLoading(false);
+        })
+        .catch((err) => {
+          setLoading(false);
+        });
+    }
+  };
   const sendMessage = async (event) => {
-    const CancelToken = axios.CancelToken;
-    const source = CancelToken.source();
     if ((event.key === "Enter" || event === "Send") && newMessage) {
       if (user) socket.emit("stop typing", selectedChat._id);
+      inputRef.current.value = null;
       try {
         const config = {
           headers: {
@@ -124,24 +154,22 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
           },
         };
         setNewMessage("");
-        await axios
-          .post(
-            "https://zolachatapp.herokuapp.com/api/message",
-            {
-              content: newMessage,
-              chatId: selectedChat._id,
-              response: response,
-            },
-            config
-          )
-          .then((data) => {
-            socket.emit("new message", data.data);
-            setResponse(null);
-            setMessages([...messages, data.data]);
-            setFetchAgain(!fetchAgain);
-          });
+        const { data } = await axios.post(
+          "https://zolachatapp.herokuapp.com/api/message",
+          {
+            multiMedia: pic,
+            content: newMessage,
+            chatId: selectedChat._id,
+            response: response,
+          },
+          config
+        );
+        setPic("");
+        socket.emit("new message", data);
+        console.log(data);
+        setMessages([...messages, data]);
+        setFetchAgain(!fetchAgain);
       } catch (error) {
-        console.log(error);
         toast({
           title: "Error Occured",
           description: "Failed to send message",
@@ -151,10 +179,6 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
           position: "bottom",
         });
       }
-      return () => {
-        // cancel the request before component unmounts
-        source.cancel();
-      };
     }
   };
 
@@ -217,11 +241,25 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
         }
       } else {
         setMessages([...messages, newMessageRecieved]);
-        setFetchAgain(!fetchAgain);
       }
     });
   });
-
+  useEffect(() => {
+    socket.on("message recieved", (newMessageRecieved) => {
+      if (
+        !selectedChatCompare ||
+        selectedChatCompare._id !== newMessageRecieved.chat._id
+      ) {
+        //notification
+        if (!notification.includes(newMessageRecieved)) {
+          setNotification([newMessageRecieved, ...notification]);
+          setFetchAgain(!fetchAgain);
+        }
+      } else {
+        setMessages([...messages, newMessageRecieved]);
+      }
+    });
+  }, []);
   return (
     <Box
       w="full"
@@ -289,18 +327,18 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                 <Box
                   display={"flex"}
                   alignItems="center"
-                  position="absolute"
+                  position={{ base: "unset", md: "absolute" }}
                   top={5}
                   zIndex={2}
                   left={10}
                   bgGradient={bgColor}
                   minW="300"
-                  w="fit-content"
+                  w={{ base: "full", md: "fit-content" }}
                   p={2}
                   opacity="0.95"
-                  transition={"all 0.2s ease-in-out"}
+                  transition={"all 0.5s ease-in-out"}
                   _hover={{ opacity: 1 }}
-                  borderRadius="full"
+                  borderRadius={{ base: "0", md: "full" }}
                   textColor={
                     colorMode === "light" ? "whiteAlpha.900" : "blackAlpha.900"
                   }
@@ -385,11 +423,7 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                       </div>
                     ) : (
                       <>
-                        <ProfileModal
-                          user={getSenderInfo(user, selectedChat.users)}
-                        >
-                          {getSender(user, selectedChat.users)}
-                        </ProfileModal>
+                        <Text>{getSender(user, selectedChat.users)}</Text>
                         <Text fontWeight={"normal"} opacity={0.8}>
                           {getSenderInfo(user, selectedChat.users).statusOnline
                             ? "online"
@@ -406,8 +440,8 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                 {/** button group*/}
                 <Box
                   position="absolute"
-                  top={7}
-                  right={10}
+                  top={{ base: 3.5, md: 7 }}
+                  right={{ base: 5, md: 10 }}
                   zIndex={2}
                   display="flex"
                   alignItems={"center"}
@@ -433,7 +467,10 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                       isOn ? "justify-end" : "justify-start"
                     } w-[50px] h-[30px] bg-slate-400 flex rounded-full p-1 cursor-pointer 
                     `}
-                    onClick={toggleSwitch}
+                    onClick={() => {
+                      toggleSwitch();
+                      toggleColorMode();
+                    }}
                   >
                     <motion.div
                       className="handle w-[20px] flex justify-center items-center h-[20px]  rounded-full"
@@ -443,12 +480,12 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                         stiffness: 700,
                         damping: 20,
                       }}
+                      onClick={toggleColorMode}
                     >
                       <IconButton
                         variant={"ghost"}
                         className="transition-opacity"
                         borderRadius="full"
-                        onClick={toggleColorMode}
                         transform="unset"
                         _hover={{
                           transform: "rotate(40deg)",
@@ -469,6 +506,13 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                       />
                     </motion.div>
                   </div>
+                  <DrawerInfoChat
+                    fetchAgain={fetchAgain}
+                    setFetchAgain={setFetchAgain}
+                  />
+                  <DrawerInfoUser
+                    _user={getSenderInfo(user, selectedChat.users)}
+                  />
                 </Box>
                 <MessageList
                   loadingMessage={loadingMessage}
@@ -497,6 +541,21 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                         borderRadius={"full"}
                         p={1}
                       >
+                        <Lottie
+                          width={40}
+                          options={{
+                            loop: true,
+                            autoplay: true,
+                            animationData: animationData,
+                            rendererSettings: {
+                              preserveAspectRatio: "xMidYMid slice",
+                            },
+                          }}
+                          style={{
+                            marginBottom: 0,
+                            marginLeft: 0,
+                          }}
+                        />
                         <Text
                           mixBlendMode={"difference"}
                           textColor="whiteAlpha.900"
@@ -522,7 +581,6 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                   >
                     <EmojiPicker
                       onEmojiClick={(emojiData, e) => {
-                        // setSelectedEmoji(emojiData.unified);
                         setNewMessage(newMessage + emojiData.emoji);
                       }}
                       autoFocusSearch={false}
@@ -569,6 +627,12 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                       width="5.5rem"
                       justifyContent={"space-around"}
                     >
+                      <Input
+                        size="sm"
+                        ref={inputRef}
+                        onChange={selectChange}
+                        type="file"
+                      ></Input>
                       <Text
                         className={`shadow-md
                       ${

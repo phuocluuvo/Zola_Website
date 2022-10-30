@@ -44,6 +44,7 @@ import UserListItem from "./UserListItem";
 import axios from "axios";
 import ChatLoading from "./loading/ChatLoading";
 import GroupChatModal from "./GroupChatModal";
+import DrawerMenuUser from "./DrawerMenuUser";
 
 function SideBar({ fetchAgain, setFetchAgain }) {
   const bg = useColorModeValue(
@@ -64,7 +65,6 @@ function SideBar({ fetchAgain, setFetchAgain }) {
     setNotification,
   } = ChatState();
   const { colorMode, toggleColorMode } = useColorMode();
-  const navigator = useNavigate();
   const [search, setSearch] = useState("");
   const [searchResult, setSearchResult] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -75,12 +75,6 @@ function SideBar({ fetchAgain, setFetchAgain }) {
   const [isOn, setIsOn] = useState(false);
 
   const toggleSwitch = () => setIsOn(!isOn);
-
-  const logoutHandler = () => {
-    setFetchAgain(!fetchAgain);
-    localStorage.removeItem("userInfo");
-    navigator("/");
-  };
 
   const handleSearch = async () => {
     if (!search) {
@@ -293,42 +287,7 @@ function SideBar({ fetchAgain, setFetchAgain }) {
                 </Tooltip>
 
                 {/**button menu */}
-                <Menu>
-                  <MenuButton
-                    borderRadius={"full"}
-                    w={{ base: "17px", md: "10px", lg: "17px" }}
-                    mx={1}
-                    mt={1}
-                    as={IconButton}
-                    position="relative"
-                    border="none"
-                    aria-label="Options"
-                    icon={
-                      <HamburgerIcon
-                        fontSize={25}
-                        textColor={
-                          colorMode === "light" ? "black" : "whiteAlpha.900"
-                        }
-                      />
-                    }
-                    variant="outline"
-                  />
-
-                  <MenuList>
-                    <ProfileModal user={user}>
-                      <MenuItem icon={<InfoIcon />}>
-                        <Text>Infomation</Text>
-                      </MenuItem>
-                    </ProfileModal>
-                    <Divider />
-                    <MenuItem
-                      icon={<ArrowForwardIcon />}
-                      onClick={logoutHandler}
-                    >
-                      Log out
-                    </MenuItem>
-                  </MenuList>
-                </Menu>
+                <DrawerMenuUser />
                 {/** Change theme (md) */}
                 <Box
                   position={"absolute"}

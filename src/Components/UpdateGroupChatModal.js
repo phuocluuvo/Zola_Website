@@ -13,6 +13,7 @@ import {
   ModalHeader,
   ModalOverlay,
   Spinner,
+  Text,
   useDisclosure,
   useToast,
 } from "@chakra-ui/react";
@@ -223,6 +224,7 @@ function UpdateGroupChatModal({
 
           <ModalCloseButton />
           <ModalBody>
+            <Text>Members</Text>
             <Box display="flex" flexWrap="wrap" w="100%" pb={3}>
               {selectedChat.users.map((u) => (
                 <UserBadgeItem
@@ -230,6 +232,8 @@ function UpdateGroupChatModal({
                   _user={u}
                   isAdmin={selectedChat?.chatAdmin._id === u._id}
                   handleFunction={() => handleRemove(u)}
+                  setFetchAgain={setFetchAgain}
+                  fetchAgain={fetchAgain}
                 />
               ))}
             </Box>

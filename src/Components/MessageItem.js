@@ -4,6 +4,7 @@ import {
   Box,
   Button,
   IconButton,
+  Image,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -102,6 +103,7 @@ function MessageItem({ messages, setMessages, m, i }) {
   return (
     <>
       <Box
+        id={m._id}
         key={m._id}
         marginBottom={1}
         display="flex"
@@ -160,7 +162,14 @@ function MessageItem({ messages, setMessages, m, i }) {
               >
                 @{m.response?.sender.username}
               </Text>
-              <Box bg="blackAlpha.500" p={1} pt={4} rounded="sm" display="flex">
+              <Box
+                bg="blackAlpha.500"
+                p={1}
+                pt={2}
+                rounded="sm"
+                display="flex"
+                flexDir={"column"}
+              >
                 <Text
                   color="whiteAlpha.800"
                   className="truncate"
@@ -168,6 +177,14 @@ function MessageItem({ messages, setMessages, m, i }) {
                 >
                   {m.response?.content}
                 </Text>
+                {m.response?.multiMedia && (
+                  <Image
+                    borderRadius={"sm"}
+                    boxSize="100px"
+                    objectFit="cover"
+                    src={m.response?.multiMedia}
+                  />
+                )}
               </Box>
             </Box>
           )}
@@ -178,6 +195,14 @@ function MessageItem({ messages, setMessages, m, i }) {
           >
             {m.content}
           </Text>
+          {m?.multiMedia && (
+            <Image
+              borderRadius={"md"}
+              boxSize={"sm"}
+              objectFit="cover"
+              src={m?.multiMedia}
+            />
+          )}
           {(isSameSender(messages, m, i, user._id) ||
             isLastMessage(messages, i, user._id)) && (
             <Text

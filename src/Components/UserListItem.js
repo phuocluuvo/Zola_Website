@@ -29,13 +29,10 @@ function UserListItem({ user, handleFunction }) {
         src={user.pic}
       />
       <Box>
-        <Text>{user.username}</Text>
+        <Text>@{user.username}</Text>
         <Box>
-          <Text fontSize="xs" className="font-bold">
-            Email :
-          </Text>
           <Text fontSize="xs" className="truncate">
-            {user.email}
+            Email: {user.email}
           </Text>
         </Box>
       </Box>
