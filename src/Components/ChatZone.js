@@ -160,25 +160,21 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
           },
         };
         setNewMessage("");
-        const { data } = await axios
-          .post(
-            "https://zolachatapp.herokuapp.com/api/message",
-            {
-              multiMedia: pic,
-              content: newMessage,
-              chatId: selectedChat._id,
-              response: response,
-            },
-            config
-          )
-          .then((data) => {
-            setPic("");
-            socket.emit("new message", data);
-            setResponse(null);
-            setMessages([...messages, data]);
-            setLoadingNewMessage(false);
-          });
-
+        const { data } = await axios.post(
+          "https://zolachatapp.herokuapp.com/api/message",
+          {
+            multiMedia: pic,
+            content: newMessage,
+            chatId: selectedChat._id,
+            response: response,
+          },
+          config
+        );
+        setPic("");
+        socket.emit("new message", data);
+        setResponse(null);
+        setMessages([...messages, data]);
+        setLoadingNewMessage(false);
         setFetchAgain(!fetchAgain);
       } catch (error) {
         toast({
