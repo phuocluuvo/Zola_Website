@@ -170,16 +170,17 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
           },
           config
         );
+
         setPic("");
-        socket.emit("new message", data);
         setResponse(null);
+        socket.emit("new message", data);
+        console.log(data);
         setMessages([...messages, data]);
-        setLoadingNewMessage(false);
         setFetchAgain(!fetchAgain);
       } catch (error) {
         toast({
           title: "Error Occured",
-          description: "Failed to send message",
+          description: "Failed to send message:" + error,
           status: "warning",
           duration: 2500,
           isClosable: true,
@@ -682,35 +683,35 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                       width="9rem"
                       justifyContent={"space-around"}
                     >
+                      <Input
+                        accept="image/*"
+                        id="icon-button-file"
+                        type="file"
+                        className="hidden"
+                        ref={inputRef}
+                        onChange={selectChange}
+                      />
                       <Tooltip
                         label={
                           !loadingPic ? "Attach an image" : "Uploading image"
                         }
                         isOpen={loadingPic}
                       >
-                        <Input
-                          accept="image/*"
-                          id="icon-button-file"
-                          type="file"
-                          className="hidden"
-                          ref={inputRef}
-                          onChange={selectChange}
-                        />
-                      </Tooltip>
-                      <label htmlFor="icon-button-file">
-                        <Text
-                          as="span"
-                          className={`shadow-md
+                        <label htmlFor="icon-button-file">
+                          <Text
+                            as="span"
+                            className={`shadow-md
                             ${
                               colorMode === "light"
                                 ? "text-darkblue bg-gradient-to-bl from-whiteAlpha.900 to-[#B1AEC6]"
                                 : "text-whiteAlpha.900 bg-gradient-to-tr from-[#1E2B6F] to-[#193F5F]"
-                            }   rounded-full text-3xl w-8 h-fit hover:bg-opacity-50`}
-                          cursor={"pointer"}
-                        >
-                          <i class="fas fa-image mr-2 mt-2 "></i>
-                        </Text>
-                      </label>
+                            }   rounded-full text-3xl w-8 h-8 hover:bg-opacity-50`}
+                            cursor={"pointer"}
+                          >
+                            <i class="fas fa-image mr-2 mt-2 "></i>
+                          </Text>
+                        </label>
+                      </Tooltip>
                       <Text
                         cursor={"pointer"}
                         className={`shadow-md
