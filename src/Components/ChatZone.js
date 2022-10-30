@@ -491,6 +491,7 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                     className="transition-opacity"
                     borderRadius="full"
                     bgColor="transparent"
+                    display={selectedChat?.isGroupChat && "none"}
                     _hover={{
                       color: "black",
                     }}
