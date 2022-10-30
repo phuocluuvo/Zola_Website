@@ -43,7 +43,7 @@ import useMessagePagination from "../hooks/useMessagePagination";
 import DrawerInfoChat from "./DrawerInfoChat";
 import DrawerInfoUser from "./DrawerInfoUser";
 
-const ENDPOINT = "http://localhost:5000";
+const ENDPOINT = "https://zolachatapp.herokuapp.com";
 
 let socket, selectedChatCompare;
 function ChatZone({ fetchAgain, setFetchAgain }) {
