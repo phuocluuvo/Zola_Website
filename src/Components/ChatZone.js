@@ -153,8 +153,6 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
       inputRef.current.value = null;
       try {
         setLoadingNewMessage(true);
-        let messageList = messages;
-        setMessages([...messages, { _id: 0 }]);
         const config = {
           headers: {
             "Content-type": "application/json",
@@ -174,13 +172,13 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
             config
           )
           .then((data) => {
+            setPic("");
+            socket.emit("new message", data);
+            setResponse(null);
+            setMessages([...messages, data]);
             setLoadingNewMessage(false);
-            setMessages([...messageList, data]);
           });
-        setPic("");
-        socket.emit("new message", data);
-        setResponse(null);
-        setMessages([...messages, data]);
+
         setFetchAgain(!fetchAgain);
       } catch (error) {
         toast({
@@ -714,10 +712,7 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                             }   rounded-full text-3xl w-8 h-fit hover:bg-opacity-50`}
                           cursor={"pointer"}
                         >
-                          <i
-                            class="fa fa-file-image-o mt-1 mr-1"
-                            aria-hidden="true"
-                          ></i>
+                          <i class="fas fa-image mr-2 mt-2 "></i>
                         </Text>
                       </label>
                       <Text
