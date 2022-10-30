@@ -285,7 +285,7 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
     console.log("");
     socket.on("answer", (answer) => {
       const win = window.open(
-        "https://zolachatapp.herokuapp.com/call/" + answer,
+        "https://zolachatapp.netlify.app/call/" + answer,
         "Call",
         "toolbar=yes,scrollbars=yes,resizable=yes,top=50,left=70,width=1200,height=600"
       );
@@ -481,7 +481,7 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                   <IconButton
                     onClick={() => {
                       window.open(
-                        "https://zolachatapp.herokuapp.com/call/null",
+                        "https://zolachatapp.netlify.app/call/null",
                         "Call Video",
                         "toolbar=yes,scrollbars=yes,resizable=yes,top=50,left=70,width=1200,height=600"
                       );
@@ -688,38 +688,38 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                       width="9rem"
                       justifyContent={"space-around"}
                     >
-                      <Input
-                        accept="image/*"
-                        id="icon-button-file"
-                        type="file"
-                        className="hidden"
-                        ref={inputRef}
-                        onChange={selectChange}
-                      />
                       <Tooltip
                         label={
-                          !loadingPic ? "Attach an image" : "Uploading an image"
+                          !loadingPic ? "Attach an image" : "Uploading image"
                         }
                         isOpen={loadingPic}
                       >
-                        <label htmlFor="icon-button-file">
-                          <Text
-                            as="span"
-                            className={`shadow-md
+                        <Input
+                          accept="image/*"
+                          id="icon-button-file"
+                          type="file"
+                          className="hidden"
+                          ref={inputRef}
+                          onChange={selectChange}
+                        />
+                      </Tooltip>
+                      <label htmlFor="icon-button-file">
+                        <Text
+                          as="span"
+                          className={`shadow-md
                             ${
                               colorMode === "light"
                                 ? "text-darkblue bg-gradient-to-bl from-whiteAlpha.900 to-[#B1AEC6]"
                                 : "text-whiteAlpha.900 bg-gradient-to-tr from-[#1E2B6F] to-[#193F5F]"
                             }   rounded-full text-3xl w-8 h-fit hover:bg-opacity-50`}
-                            cursor={"pointer"}
-                          >
-                            <i
-                              class="text-2xl text-white fa fa-camera"
-                              aria-hidden="true"
-                            ></i>
-                          </Text>
-                        </label>
-                      </Tooltip>
+                          cursor={"pointer"}
+                        >
+                          <i
+                            className="fa fa-picture-o mt-1 mr-1"
+                            aria-hidden="true"
+                          ></i>
+                        </Text>
+                      </label>
                       <Text
                         cursor={"pointer"}
                         className={`shadow-md
