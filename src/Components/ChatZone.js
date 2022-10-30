@@ -715,7 +715,7 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                           cursor={"pointer"}
                         >
                           <i
-                            className="fa fa-picture-o mt-1 mr-1"
+                            class="fa fa-file-image-o mt-1 mr-1"
                             aria-hidden="true"
                           ></i>
                         </Text>
