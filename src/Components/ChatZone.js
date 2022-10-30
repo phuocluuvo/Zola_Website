@@ -24,7 +24,7 @@ import {
 } from "@chakra-ui/react";
 import EmojiPicker, { Theme } from "emoji-picker-react";
 import axios from "axios";
-import Lottie from "react-lottie";
+
 import io from "socket.io-client";
 import React, { useEffect, useRef, useState } from "react";
 import { getSender, getSenderInfo } from "../logic/ChatLogic";
@@ -541,21 +541,6 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                         borderRadius={"full"}
                         p={1}
                       >
-                        <Lottie
-                          width={40}
-                          options={{
-                            loop: true,
-                            autoplay: true,
-                            animationData: animationData,
-                            rendererSettings: {
-                              preserveAspectRatio: "xMidYMid slice",
-                            },
-                          }}
-                          style={{
-                            marginBottom: 0,
-                            marginLeft: 0,
-                          }}
-                        />
                         <Text
                           mixBlendMode={"difference"}
                           textColor="whiteAlpha.900"
