@@ -74,25 +74,14 @@ function ChatList({ fetchAgain, setFetchAgain }) {
               width="100%"
               justifyItems={"center"}
               alignItems="center"
-              _hover={{
-                bg:
-                  selectedChat?._id !== chat._id
-                    ? "whiteAlpha.500"
-                    : "whiteAlpha.900",
-                border: "2px solid white",
-                p: "6px",
-              }}
-              className="transition-colors"
+              className="transition-colors "
               bgColor={
                 selectedChat
                   ? selectedChat._id === chat._id
                     ? "white"
-                    : "whiteAlpha.700"
-                  : "whiteAlpha.700"
+                    : ""
+                  : ""
               }
-              borderRadius={"full"}
-              p={"8px"}
-              mt={3}
               mx={3}
             >
               <Box
@@ -100,7 +89,7 @@ function ChatList({ fetchAgain, setFetchAgain }) {
                 className="transition-opacity pullRight"
                 onClick={() => {
                   selectedChat
-                    ? io("https://zolachatapp.herokuapp.com").emit(
+                    ? io("http://localhost:5000").emit(
                         "outchat",
                         selectedChat._id
                       )
@@ -146,7 +135,6 @@ function ChatList({ fetchAgain, setFetchAgain }) {
                     src={getSenderInfo(user, chat.users).pic}
                   ></Avatar>
                 )}
-
                 <Box flex="1" px="2" maxW="400px" w="0.5">
                   <Text
                     fontWeight={"bold"}
@@ -202,30 +190,31 @@ function ChatList({ fetchAgain, setFetchAgain }) {
                 >
                   {moment(chat.latestMessage?.createdAt).fromNow()}
                 </Text>
-              </Box>
-              <Box>
-                <Menu>
-                  <MenuButton
-                    as={IconButton}
-                    aria-label="Options"
-                    icon={<ChevronDownIcon />}
-                    variant="outline"
-                    border="none"
-                    color={
-                      selectedChat?._id === chat._id
-                        ? "blackAlpha.500"
-                        : "whiteAlpha.900"
-                    }
-                    _hover={{ color: "blue.900" }}
-                    _active={{ color: "blue.900", fontSize: "20px" }}
-                    className={"forcus:animate-bounce transition-transform"}
-                  />
-                  <MenuList>
-                    <MenuItem icon={<DeleteIcon />} color={"red.500"}>
-                      Delete Chat
-                    </MenuItem>
-                  </MenuList>
-                </Menu>
+                {/*menu button*/}
+                <Box>
+                  <Menu>
+                    <MenuButton
+                      as={IconButton}
+                      aria-label="Options"
+                      icon={<ChevronDownIcon />}
+                      variant="outline"
+                      border="none"
+                      color={
+                        selectedChat?._id === chat._id
+                          ? "blackAlpha.500"
+                          : "whiteAlpha.900"
+                      }
+                      _hover={{ color: "blue.900" }}
+                      _active={{ color: "blue.900", fontSize: "20px" }}
+                      className={"forcus:animate-bounce transition-transform"}
+                    />
+                    <MenuList>
+                      <MenuItem icon={<DeleteIcon />} color={"red.500"}>
+                        Delete Chat
+                      </MenuItem>
+                    </MenuList>
+                  </Menu>
+                </Box>
               </Box>
             </Box>
             <Divider w="95%" />
