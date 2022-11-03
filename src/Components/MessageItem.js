@@ -196,6 +196,7 @@ function MessageItem({ messages, setMessages, m, i }) {
           <Text
             fontSize={{ base: "sm", md: "md" }}
             width={"fit-content"}
+            whiteSpace="pre-wrap"
             color={m.content === "deleted" && "gray.600"}
             fontStyle={m.content === "deleted" && "italic"}
           >

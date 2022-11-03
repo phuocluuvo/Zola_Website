@@ -32,7 +32,7 @@ export default function NavigationSideBar() {
   const [isHover, setHover] = useState(false);
   const logoutHandler = () => {
     localStorage.removeItem("userInfo");
-    navigator("/");
+    window.location.reload();
   };
   const { colorMode } = useColorMode();
 
@@ -210,9 +210,9 @@ export default function NavigationSideBar() {
             </MenuItem>
           </ProfileModal>
           <MenuDivider />
-          <MenuItem icon={<ArrowForwardIcon />} onClick={logoutHandler}>
+          <MenuItem icon={<ArrowForwardIcon />} onClick={() => logoutHandler()}>
             <Text textAlign={"left"} w="full">
-              Logout
+              Log out
             </Text>
           </MenuItem>
         </MenuList>

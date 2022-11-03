@@ -47,6 +47,9 @@ import DrawerInfoUser from "./DrawerInfoUser";
 import { RiSendPlaneFill } from "react-icons/ri";
 import { AiFillSmile } from "react-icons/ai";
 import { MdAddPhotoAlternate } from "react-icons/md";
+import Lottie from "react-lottie";
+import { IoResize, IoResizeOutline } from "react-icons/io5";
+
 const ENDPOINT = "https://zolachatapp.herokuapp.com";
 
 let socket, selectedChatCompare;
@@ -57,6 +60,7 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
     "linear(to-b,#1E2B6F,#193F5F)"
   );
   const [loadingNewMessage, setLoadingNewMessage] = useState(false);
+  const [toggleExpand, setToggleExpand] = useState(false);
   const [loading, setLoading] = useState(false);
   const [newMessage, setNewMessage] = useState("");
   const [socketConnected, setSocketConnected] = useState(false);
@@ -151,8 +155,11 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
         });
     }
   };
-  const sendMessage = async (event) => {
-    if ((event.key === "Enter" || event === "Send") && (newMessage || pic)) {
+  const sendMessage = async (e) => {
+    if (
+      ((e.keyCode == 13 && !e.shiftKey) || e === "Send") &&
+      (newMessage || pic)
+    ) {
       if (user) socket.emit("stop typing", selectedChat._id);
       inputRef.current.value = null;
       try {
@@ -199,6 +206,9 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
   };
 
   const typingHandler = (e) => {
+    if (e.keyCode === 13 && e.shiftKey) {
+      setNewMessage(newMessage + "&#13");
+    } else setNewMessage(e.target.value);
     setNewMessage(e.target.value);
     if (!socketConnected) return;
     //if user is typing
@@ -229,7 +239,7 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
       .post(
         "https://zolachatapp.herokuapp.com/api/message",
         {
-          content: "📞📞📞📞",
+          content: "📞 A call was made by " + user.username,
           chatId: selectedChat._id,
         },
         config
@@ -495,7 +505,6 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                     className="transition-opacity"
                     borderRadius="full"
                     bgColor="transparent"
-                    display={selectedChat?.isGroupChat && "none"}
                     _hover={{
                       color: "black",
                     }}
@@ -534,7 +543,6 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                         transform="unset"
                         _hover={{
                           transform: "rotate(40deg)",
-
                           color: "black",
                           bgGradient:
                             colorMode === "light"
@@ -551,6 +559,7 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                       />
                     </motion.div>
                   </div>
+
                   <DrawerInfoChat
                     fetchAgain={fetchAgain}
                     setFetchAgain={setFetchAgain}
@@ -566,12 +575,12 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                   hasMore={hasMore}
                   setPageNumber={setPageNumber}
                 />
+
                 <FormControl
                   onKeyDown={sendMessage}
                   isRequired
                   bottom={0}
                   left={0}
-                  p={5}
                   pos={{ base: "relative", md: "unset" }}
                 >
                   {isTyping ? (
@@ -580,12 +589,17 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                         w="fit-content"
                         border={"1px solid black"}
                         display="flex"
-                        pos="relative"
+                        pos="absolute"
                         bottom={0}
+                        top={-9}
+                        alignItems="center"
+                        className="backdrop-blur-lg bg-opacity-50"
                         bgColor={"blackAlpha.800"}
+                        borderRadius={"full"}
                         roundedBottomLeft={0}
                         p={1}
                       >
+                        {" "}
                         <Text
                           mixBlendMode={"difference"}
                           textColor="whiteAlpha.900"
@@ -598,6 +612,21 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                             : selectedChat.users[0].fullname}{" "}
                           is typing
                         </Text>
+                        <Lottie
+                          width={30}
+                          options={{
+                            loop: true,
+                            autoplay: true,
+                            animationData: animationData,
+                            rendererSettings: {
+                              preserveAspectRatio: "xMidYMid slice",
+                            },
+                          }}
+                          style={{
+                            marginBottom: 0,
+                            marginLeft: 0,
+                          }}
+                        />
                       </Box>
                     </Fade>
                   ) : (
@@ -642,6 +671,7 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                       theme={colorMode ? Theme.DARK : Theme.LIGHT}
                     />
                   </Box>
+
                   {pic && (
                     <>
                       <Image
@@ -667,7 +697,12 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                       ></IconButton>
                     </>
                   )}
-                  <InputGroup size="lg">
+                  <Box
+                    display={"flex"}
+                    alignItems={"center"}
+                    bg="whiteAlpha.900"
+                    py="2"
+                  >
                     {response && (
                       <Box
                         pos="absolute"
@@ -700,24 +735,52 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                         </Box>
                       </Box>
                     )}
-
-                    <Textarea
-                      disabled={loadingNewMessage}
-                      variant="outline"
-                      bg="whiteAlpha.900"
-                      textColor={"black"}
-                      placeholder="Type something..."
-                      value={newMessage}
-                      h="20"
-                      rounded={"sm"}
-                      onChange={typingHandler}
-                      _focus={{
-                        opacity: 0.8,
-                      }}
-                    />
-                    <InputRightElement
-                      width="11rem"
+                    <Box flex={1} pos="relative">
+                      <Textarea
+                        className="scrollbar-thin scrollbar-thumb-dark-blue"
+                        disabled={loadingNewMessage}
+                        variant="outline"
+                        bg="whiteAlpha.900"
+                        textColor={"black"}
+                        placeholder="Type something..."
+                        value={newMessage}
+                        h="20"
+                        rows={1}
+                        maxH="80"
+                        minH="10"
+                        height={!toggleExpand ? 10 : 80}
+                        autosize
+                        rounded={"sm"}
+                        onChange={typingHandler}
+                        _focus={{
+                          opacity: 0.5,
+                        }}
+                      />
+                      <IconButton
+                        variant={"ghost"}
+                        className="transition-opacity"
+                        borderRadius="full"
+                        transform="unset"
+                        right={0}
+                        bottom={0}
+                        resize="none"
+                        _hover={{
+                          bgGradient:
+                            colorMode === "light"
+                              ? "linear(to-b,#C39A9E,#808293)"
+                              : "linear(to-b,#1E2B6F,#193F5F)",
+                        }}
+                        pos="absolute"
+                        zIndex={10}
+                        size="xs"
+                        icon={<IoResize w="10" h="10" color="black" />}
+                        onClick={() => setToggleExpand(!toggleExpand)}
+                      />
+                    </Box>
+                    <Box
+                      w={"12rem"}
                       height={"full"}
+                      display="flex"
                       alignItems={"center"}
                       justifyContent={"space-evenly"}
                     >
@@ -761,6 +824,7 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                           />
                         </label>
                       </Tooltip>
+
                       <IconButton
                         icon={
                           <Icon
@@ -781,7 +845,6 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                         _hover={{ opacity: 0.8 }}
                         onClick={() => setToggle(!toggle)}
                       />
-
                       <IconButton
                         icon={
                           <Icon
@@ -804,8 +867,8 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                         _hover={{ opacity: 0.8 }}
                         onClick={() => sendMessage("Send")}
                       />
-                    </InputRightElement>
-                  </InputGroup>
+                    </Box>
+                  </Box>
                 </FormControl>
               </Box>
             )}
