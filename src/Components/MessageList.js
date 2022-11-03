@@ -27,7 +27,7 @@ function MessageList({
     [loadingMessage, hasMore]
   );
   return (
-    <ScrollableFeed className="pb-32 pt-16 px-4 w-full scrollbar-thin scroll-smooth">
+    <ScrollableFeed className="pt-16 px-4 w-full scrollbar-thin scroll-smooth scrollbar-thumb-slate-600">
       <div>{loadingMessage && "Loading..."}</div>
       <div>{error && "Error"}</div>
       {messages.map((m, i) =>

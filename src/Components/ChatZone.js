@@ -1,6 +1,7 @@
 import {
   ChevronLeftIcon,
   CloseIcon,
+  Icon,
   MoonIcon,
   PhoneIcon,
   SunIcon,
@@ -20,6 +21,7 @@ import {
   InputRightElement,
   Spinner,
   Text,
+  Textarea,
   Tooltip,
   useColorMode,
   useColorModeValue,
@@ -42,7 +44,9 @@ import moment from "moment";
 import useMessagePagination from "../hooks/useMessagePagination";
 import DrawerInfoChat from "./DrawerInfoChat";
 import DrawerInfoUser from "./DrawerInfoUser";
-
+import { RiSendPlaneFill } from "react-icons/ri";
+import { AiFillSmile } from "react-icons/ai";
+import { MdAddPhotoAlternate } from "react-icons/md";
 const ENDPOINT = "https://zolachatapp.herokuapp.com";
 
 let socket, selectedChatCompare;
@@ -160,23 +164,26 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
           },
         };
         setNewMessage("");
-        const { data } = await axios.post(
-          "https://zolachatapp.herokuapp.com/api/message",
-          {
-            multiMedia: pic,
-            content: newMessage,
-            chatId: selectedChat._id,
-            response: response,
-          },
-          config
-        );
-
-        setPic("");
-        setResponse(null);
-        socket.emit("new message", data);
-        console.log(data);
-        setMessages([...messages, data]);
-        setFetchAgain(!fetchAgain);
+        await axios
+          .post(
+            "https://zolachatapp.herokuapp.com/api/message",
+            {
+              multiMedia: pic,
+              content: newMessage,
+              chatId: selectedChat._id,
+              response: response,
+            },
+            config
+          )
+          .then((data) => {
+            setPic("");
+            setResponse(null);
+            socket.emit("new message", data.data);
+            console.log(data.data);
+            setMessages([...messages, data.data]);
+            setLoadingNewMessage(false);
+            setFetchAgain(!fetchAgain);
+          });
       } catch (error) {
         toast({
           title: "Error Occured",
@@ -186,6 +193,7 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
           isClosable: true,
           position: "bottom",
         });
+        setLoadingNewMessage(false);
       }
     }
   };
@@ -278,9 +286,9 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
 
   useEffect(() => {
     console.log("");
-    socket.on("answer", (answer) => {
+    socket.on("answer", (id) => {
       const win = window.open(
-        "https://zolachatapp.netlify.app/call/" + answer,
+        "https://zolachatapp.netlify.app/call/" + id + "/" + id,
         "Call",
         "toolbar=yes,scrollbars=yes,resizable=yes,top=50,left=70,width=1200,height=600"
       );
@@ -476,7 +484,8 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                   <IconButton
                     onClick={() => {
                       window.open(
-                        "https://zolachatapp.netlify.app/call/null",
+                        "https://zolachatapp.netlify.app/call/null" +
+                          getSenderInfo(user, selectedChat.users)._id,
                         "Call Video",
                         "toolbar=yes,scrollbars=yes,resizable=yes,top=50,left=70,width=1200,height=600"
                       );
@@ -563,7 +572,7 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                   bottom={0}
                   left={0}
                   p={5}
-                  pos="absolute"
+                  pos={{ base: "relative", md: "unset" }}
                 >
                   {isTyping ? (
                     <Fade in={onToggle}>
@@ -572,9 +581,9 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                         border={"1px solid black"}
                         display="flex"
                         pos="relative"
-                        bottom={-5}
+                        bottom={0}
                         bgColor={"blackAlpha.800"}
-                        borderRadius={"full"}
+                        roundedBottomLeft={0}
                         p={1}
                       >
                         <Text
@@ -588,6 +597,31 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                             ? selectedChat.users[1].fullname
                             : selectedChat.users[0].fullname}{" "}
                           is typing
+                        </Text>
+                      </Box>
+                    </Fade>
+                  ) : (
+                    <></>
+                  )}
+                  {loadingNewMessage ? (
+                    <Fade in={onToggle}>
+                      <Box
+                        w="fit-content"
+                        border={"1px solid black"}
+                        display="flex"
+                        pos="relative"
+                        bottom={0}
+                        bgColor={"blackAlpha.800"}
+                        borderRadius={"full"}
+                        roundedBottomLeft={0}
+                        p={1}
+                      >
+                        <Text
+                          mixBlendMode={"difference"}
+                          textColor="whiteAlpha.900"
+                          fontSize={12}
+                        >
+                          ...sending new messsage
                         </Text>
                       </Box>
                     </Fade>
@@ -633,7 +667,7 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                       ></IconButton>
                     </>
                   )}
-                  <InputGroup size="lg" marginY={4}>
+                  <InputGroup size="lg">
                     {response && (
                       <Box
                         pos="absolute"
@@ -667,21 +701,25 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                       </Box>
                     )}
 
-                    <Input
+                    <Textarea
+                      disabled={loadingNewMessage}
                       variant="outline"
-                      rounded={"full"}
                       bg="whiteAlpha.900"
                       textColor={"black"}
                       placeholder="Type something..."
                       value={newMessage}
+                      h="20"
+                      rounded={"sm"}
                       onChange={typingHandler}
                       _focus={{
                         opacity: 0.8,
                       }}
                     />
                     <InputRightElement
-                      width="9rem"
-                      justifyContent={"space-around"}
+                      width="11rem"
+                      height={"full"}
+                      alignItems={"center"}
+                      justifyContent={"space-evenly"}
                     >
                       <Input
                         accept="image/*"
@@ -698,47 +736,74 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                         isOpen={loadingPic}
                       >
                         <label htmlFor="icon-button-file">
-                          <Text
-                            as="span"
-                            className={`shadow-md
-                            ${
-                              colorMode === "light"
-                                ? "text-darkblue bg-gradient-to-bl from-whiteAlpha.900 to-[#B1AEC6]"
-                                : "text-whiteAlpha.900 bg-gradient-to-tr from-[#1E2B6F] to-[#193F5F]"
-                            }   rounded-full text-3xl w-8 h-8 hover:bg-opacity-50`}
-                            cursor={"pointer"}
-                          >
-                            <i class="fas fa-image mr-2 mt-2 "></i>
-                          </Text>
+                          <IconButton
+                            icon={
+                              <Icon
+                                color={
+                                  colorMode === "light"
+                                    ? "blackAlpha.800"
+                                    : "white"
+                                }
+                                as={MdAddPhotoAlternate}
+                                w="8"
+                                h="8"
+                              />
+                            }
+                            w="10"
+                            h="10"
+                            rounded="full"
+                            bgGradient={
+                              colorMode !== "light"
+                                ? "linear-gradient(to top right, #1E2B6F, #193F5F)"
+                                : "unset"
+                            }
+                            _hover={{ opacity: 0.8 }}
+                          />
                         </label>
                       </Tooltip>
-                      <Text
-                        cursor={"pointer"}
-                        className={`shadow-md
-                      ${
-                        colorMode === "light"
-                          ? "text-darkblue bg-gradient-to-bl from-whiteAlpha.900 to-[#B1AEC6]"
-                          : "text-whiteAlpha.900 bg-gradient-to-tr from-[#1E2B6F] to-[#193F5F]"
-                      }
-                      rounded-full text-3xl w-8 h-8  hover:bg-opacity-50`}
+                      <IconButton
+                        icon={
+                          <Icon
+                            color={
+                              colorMode === "light" ? "blackAlpha.800" : "white"
+                            }
+                            as={AiFillSmile}
+                            w="8"
+                            h="8"
+                          />
+                        }
+                        rounded="full"
+                        bgGradient={
+                          colorMode !== "light"
+                            ? "linear-gradient(to top right, #1E2B6F, #193F5F)"
+                            : "unset"
+                        }
+                        _hover={{ opacity: 0.8 }}
                         onClick={() => setToggle(!toggle)}
-                      >
-                        <i className="fa fa-smile" aria-hidden="true"></i>
-                      </Text>
+                      />
 
-                      <Text
-                        cursor={"pointer"}
-                        className={`shadow-md
-                      ${
-                        colorMode === "light"
-                          ? "text-darkblue bg-gradient-to-bl from-whiteAlpha.900 to-[#B1AEC6]"
-                          : "text-whiteAlpha.900 bg-gradient-to-tr from-[#1E2B6F] to-[#193F5F]"
-                      }
-                      rounded-full text-3xl w-8 h-8  hover:bg-opacity-50`}
+                      <IconButton
+                        icon={
+                          <Icon
+                            color={
+                              colorMode === "light" ? "blackAlpha.800" : "white"
+                            }
+                            as={RiSendPlaneFill}
+                            w="8"
+                            h="8"
+                          />
+                        }
+                        w="10"
+                        h="10"
+                        rounded="full"
+                        bgGradient={
+                          colorMode !== "light"
+                            ? "linear-gradient(to top right, #1E2B6F, #193F5F)"
+                            : "unset"
+                        }
+                        _hover={{ opacity: 0.8 }}
                         onClick={() => sendMessage("Send")}
-                      >
-                        <i className="fa fa-paper-plane" aria-hidden="true"></i>
-                      </Text>
+                      />
                     </InputRightElement>
                   </InputGroup>
                 </FormControl>

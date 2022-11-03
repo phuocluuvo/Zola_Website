@@ -20,6 +20,7 @@ import {
 import axios from "axios";
 import moment from "moment";
 import React, { memo, useState } from "react";
+import ReactLinkify from "react-linkify";
 import {
   isLastMessage,
   isSameSender,
@@ -141,6 +142,7 @@ function MessageItem({ messages, setMessages, m, i }) {
           display="flex"
           flexDirection="column"
           maxWidth="75%"
+          minW={"75px"}
           w={"fit-content"}
           borderRadius="10px"
           backgroundColor={`${
@@ -192,11 +194,19 @@ function MessageItem({ messages, setMessages, m, i }) {
             </Box>
           )}
           <Text
+            fontSize={{ base: "sm", md: "md" }}
             width={"fit-content"}
             color={m.content === "deleted" && "gray.600"}
             fontStyle={m.content === "deleted" && "italic"}
           >
-            {m.content}
+            <ReactLinkify
+              properties={{
+                target: "_blank",
+                style: { color: "red", fontWeight: "bold" },
+              }}
+            >
+              {m.content}
+            </ReactLinkify>
           </Text>
           {m?.multiMedia && (
             <Image
@@ -209,6 +219,7 @@ function MessageItem({ messages, setMessages, m, i }) {
               src={m?.multiMedia}
             />
           )}
+          {m?.multiVideo && <VideoPlayer src={m?.multiVideo} />}
           {(isSameSender(messages, m, i, user._id) ||
             isLastMessage(messages, i, user._id)) && (
             <Text

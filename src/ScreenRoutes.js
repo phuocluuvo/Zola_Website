@@ -19,7 +19,7 @@ function ScreenRoutes() {
         <Routes location={location} key={location.pathname}>
           <Route exact path="/chats" element={<ChatPage />} />
           <Route exact path="/" element={<WelcomePage />} />
-          <Route exact path="/call/:caller" element={<CallPage />} />
+          <Route exact path="/call/:id/:user" element={<CallPage />} />
         </Routes>
       </Suspense>
     </AnimatePresence>

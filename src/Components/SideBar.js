@@ -286,8 +286,6 @@ function SideBar({ fetchAgain, setFetchAgain }) {
                   </Button>
                 </Tooltip>
 
-                {/**button menu */}
-                <DrawerMenuUser />
                 {/** Change theme (md) */}
                 <Box
                   position={"absolute"}
@@ -452,7 +450,7 @@ function SideBar({ fetchAgain, setFetchAgain }) {
         zIndex={0}
         opacity={0.3}
         w="full"
-        filter={"grayscale(80%)"}
+        filter={"grayscale(100%)"}
         overflowX="hidden"
         bgRepeat={"no-repeat"}
         bgSize="cover"

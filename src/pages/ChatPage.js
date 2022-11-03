@@ -6,6 +6,7 @@ import SideBarClosed from "../Components/SideBarClosed";
 import { ChatState } from "../providers/ChatProvider";
 import { motion, useIsPresent } from "framer-motion";
 import { ErrorBoundary } from "../errors/ErrorBoundary";
+import NavigationSideBar from "./NavigationSideBar";
 
 function ChatPage() {
   const { closeSideBar, selectedChat, user } = ChatState();
@@ -17,28 +18,37 @@ function ChatPage() {
       <div className=" max-w-[100vw] h-[100vh] flex flex-row p-0 relative overflow-hidden">
         {user && (
           <>
-            <Box
-              display={{
-                base: !selectedChat ? "flex" : "none",
-                md: closeSideBar ? "none" : "flex",
-              }}
-              flex={{ base: "1", md: "0.3" }}
-            >
-              <SideBar fetchAgain={fetchAgain} setFetchAgain={setFetchAgain} />
-            </Box>
-            <Box
-              w={"fit-content"}
-              display={{ base: "none", md: closeSideBar ? "flex" : "none" }}
-              flex={{ base: "1", md: "0" }}
-            >
-              <SideBarClosed />
-            </Box>
-            <Box
-              display={{ base: !selectedChat ? "none" : "flex", md: "flex" }}
-              flex={{ base: closeSideBar ? "1" : "auto", md: "1" }}
-            >
-              <ChatZone fetchAgain={fetchAgain} setFetchAgain={setFetchAgain} />
-            </Box>
+            <NavigationSideBar />
+            <>
+              <Box
+                display={{
+                  base: !selectedChat ? "flex" : "none",
+                  md: closeSideBar ? "none" : "flex",
+                }}
+                flex={{ base: "1", md: "0.3" }}
+              >
+                <SideBar
+                  fetchAgain={fetchAgain}
+                  setFetchAgain={setFetchAgain}
+                />
+              </Box>
+              <Box
+                w={"fit-content"}
+                display={{ base: "none", md: closeSideBar ? "flex" : "none" }}
+                flex={{ base: "1", md: "0" }}
+              >
+                <SideBarClosed />
+              </Box>
+              <Box
+                display={{ base: !selectedChat ? "none" : "flex", md: "flex" }}
+                flex={{ base: closeSideBar ? "1" : "auto", md: "1" }}
+              >
+                <ChatZone
+                  fetchAgain={fetchAgain}
+                  setFetchAgain={setFetchAgain}
+                />
+              </Box>
+            </>
           </>
         )}
         <motion.div

@@ -29,7 +29,6 @@ import { ChatState } from "../providers/ChatProvider";
 import axios from "axios";
 import UserListItem from "./UserListItem";
 import ListUsers from "./ListUsers";
-
 export default function DrawerInfoChat({ fetchAgain, setFetchAgain }) {
   const { colorMode } = useColorMode();
   const btnRef = React.useRef();

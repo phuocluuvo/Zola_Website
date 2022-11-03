@@ -3,6 +3,7 @@ import {
   Avatar,
   AvatarGroup,
   Box,
+  Divider,
   IconButton,
   Menu,
   MenuButton,
@@ -64,150 +65,171 @@ function ChatList({ fetchAgain, setFetchAgain }) {
   };
   console.log("chatList is rendered");
   return (
-    <VStack zIndex={1} mb={5}>
+    <VStack zIndex={1} mb={5} spacing="0">
       {user &&
         chats.map((chat, index) => (
-          <Box
-            display={"flex"}
-            width="95%"
-            justifyItems={"center"}
-            alignItems="center"
-            _hover={{
-              bg:
-                selectedChat?._id !== chat._id
-                  ? "whiteAlpha.500"
-                  : "whiteAlpha.900",
-              border: "2px solid white",
-              p: "6px",
-            }}
-            className="transition-colors"
-            bgColor={
-              selectedChat
-                ? selectedChat._id === chat._id
-                  ? "white"
-                  : "whiteAlpha.700"
-                : "whiteAlpha.700"
-            }
-            borderRadius={"full"}
-            p={"8px"}
-            mt={3}
-            mx={3}
-          >
+          <>
             <Box
-              key={index}
-              className="transition-opacity"
-              onClick={() => {
-                selectedChat
-                  ? io("https://zolachatapp.herokuapp.com").emit(
-                      "outchat",
-                      selectedChat._id
-                    )
-                  : console.log("out out out");
-                setSelectedChat(chat);
+              display={"flex"}
+              width="100%"
+              justifyItems={"center"}
+              alignItems="center"
+              _hover={{
+                bg:
+                  selectedChat?._id !== chat._id
+                    ? "whiteAlpha.500"
+                    : "whiteAlpha.900",
+                border: "2px solid white",
+                p: "6px",
               }}
-              cursor="pointer"
-              position="relative"
-              display="flex"
-              alignItems={"center"}
-              justifyContent="space-between"
-              flex={1}
+              className="transition-colors"
+              bgColor={
+                selectedChat
+                  ? selectedChat._id === chat._id
+                    ? "white"
+                    : "whiteAlpha.700"
+                  : "whiteAlpha.700"
+              }
+              borderRadius={"full"}
+              p={"8px"}
+              mt={3}
+              mx={3}
             >
-              {chat.isGroupChat ? (
-                <AvatarGroup
-                  size={"xs"}
-                  max={3}
-                  spacing={0}
-                  flexWrap={"wrap"}
-                  flexDirection="row-reverse"
-                  width="55px"
-                  py={0.5}
-                  pl={1}
-                >
-                  {chat.users.map((u) => (
-                    <Avatar
-                      key={u._id}
-                      size={"md"}
-                      name={chat.chatName}
-                      src={u.pic}
-                    />
-                  ))}
-                </AvatarGroup>
-              ) : (
-                <Avatar
-                  showBorder={true}
-                  width="55px"
-                  height="55px"
-                  size={"md"}
-                  name={user?._id && getSender(user, chat.users)}
-                  src={getSenderInfo(user, chat.users).pic}
-                ></Avatar>
-              )}
+              <Box
+                key={index}
+                className="transition-opacity pullRight"
+                onClick={() => {
+                  selectedChat
+                    ? io("https://zolachatapp.herokuapp.com").emit(
+                        "outchat",
+                        selectedChat._id
+                      )
+                    : console.log("out out out");
+                  setSelectedChat(chat);
+                }}
+                cursor="pointer"
+                position="relative"
+                display="flex"
+                alignItems={"center"}
+                justifyContent="space-between"
+                flex={1}
+                py="7px"
+                px="15px"
+              >
+                {chat.isGroupChat ? (
+                  <AvatarGroup
+                    size={"xs"}
+                    max={3}
+                    spacing={0}
+                    flexWrap={"wrap"}
+                    flexDirection="row-reverse"
+                    width="55px"
+                    py={0.5}
+                    pl={1}
+                  >
+                    {chat.users.map((u) => (
+                      <Avatar
+                        key={u._id}
+                        size={"md"}
+                        name={chat.chatName}
+                        src={u.pic}
+                      />
+                    ))}
+                  </AvatarGroup>
+                ) : (
+                  <Avatar
+                    showBorder={true}
+                    width="55px"
+                    height="55px"
+                    size={"md"}
+                    name={user?._id && getSender(user, chat.users)}
+                    src={getSenderInfo(user, chat.users).pic}
+                  ></Avatar>
+                )}
 
-              <Box flex="1" px="2" maxW="400px" w="0.5">
+                <Box flex="1" px="2" maxW="400px" w="0.5">
+                  <Text
+                    fontWeight={"bold"}
+                    textColor={
+                      selectedChat?._id === chat._id
+                        ? "black"
+                        : "whiteAlpha.900"
+                    }
+                    className="truncate"
+                  >
+                    {chat.isGroupChat
+                      ? chat.chatName
+                      : getSender(user, chat.users)}
+                  </Text>
+                  <Text
+                    textColor={
+                      selectedChat?._id === chat._id
+                        ? "black"
+                        : "whiteAlpha.500"
+                    }
+                    w={{ base: "100%", md: "250px" }}
+                    textOverflow={"ellipsis"}
+                    overflow="hidden"
+                    whiteSpace={"nowrap"}
+                  >
+                    {chat.latestMessage?.content === undefined ? (
+                      <Text color={"whiteAlpha.500"} className="italic">
+                        {"Chat something 🥺"}
+                      </Text>
+                    ) : chat.isGroupChat ? (
+                      chat.latestMessage &&
+                      `@${chat.latestMessage?.sender.username}: ${chat.latestMessage?.content} `
+                    ) : (
+                      `${
+                        chat.latestMessage?.sender._id === user._id
+                          ? "You: " + chat.latestMessage?.content
+                          : chat.latestMessage?.content
+                      }`
+                    )}{" "}
+                  </Text>
+                </Box>
                 <Text
-                  fontWeight={"bold"}
-                  textColor={"black"}
-                  className="truncate"
+                  bgClip={"text"}
+                  fontSize="12"
+                  bgGradient={
+                    selectedChat?._id === chat._id
+                      ? "linear(to-br,blue.900,blue.800)"
+                      : "linear(to-br,white,white)"
+                  }
+                  textAlign={"right"}
+                  w={{ base: "200px", md: "100px" }}
+                  p={{ base: "5", md: "1" }}
                 >
-                  {chat.isGroupChat
-                    ? chat.chatName
-                    : getSender(user, chat.users)}
-                </Text>
-                <Text
-                  textColor={"black"}
-                  w={{ base: "100%", md: "250px" }}
-                  textOverflow={"ellipsis"}
-                  overflow="hidden"
-                  whiteSpace={"nowrap"}
-                >
-                  {chat.latestMessage?.content === undefined ? (
-                    <Text color={"GrayText"} className="italic">
-                      {"Chat something 🥺"}
-                    </Text>
-                  ) : chat.isGroupChat ? (
-                    chat.latestMessage &&
-                    `@${chat.latestMessage?.sender.username}: ${chat.latestMessage?.content} `
-                  ) : (
-                    `${
-                      chat.latestMessage?.sender._id === user._id
-                        ? "You: " + chat.latestMessage?.content
-                        : chat.latestMessage?.content
-                    }`
-                  )}{" "}
+                  {moment(chat.latestMessage?.createdAt).fromNow()}
                 </Text>
               </Box>
-              <Text
-                bgClip={"text"}
-                fontSize="12"
-                bgGradient="linear(to-br,blue.900,blue.800)"
-                textAlign={"right"}
-                w={{ base: "200px", md: "100px" }}
-                p={{ base: "5", md: "1" }}
-              >
-                {moment(chat.latestMessage?.createdAt).calendar()}
-              </Text>
+              <Box>
+                <Menu>
+                  <MenuButton
+                    as={IconButton}
+                    aria-label="Options"
+                    icon={<ChevronDownIcon />}
+                    variant="outline"
+                    border="none"
+                    color={
+                      selectedChat?._id === chat._id
+                        ? "blackAlpha.500"
+                        : "whiteAlpha.900"
+                    }
+                    _hover={{ color: "blue.900" }}
+                    _active={{ color: "blue.900", fontSize: "20px" }}
+                    className={"forcus:animate-bounce transition-transform"}
+                  />
+                  <MenuList>
+                    <MenuItem icon={<DeleteIcon />} color={"red.500"}>
+                      Delete Chat
+                    </MenuItem>
+                  </MenuList>
+                </Menu>
+              </Box>
             </Box>
-            <Box>
-              <Menu>
-                <MenuButton
-                  as={IconButton}
-                  aria-label="Options"
-                  icon={<ChevronDownIcon />}
-                  variant="outline"
-                  border="none"
-                  color={"blackAlpha.500"}
-                  _hover={{ color: "blue.900" }}
-                  _active={{ color: "blue.900", fontSize: "20px" }}
-                  className={"forcus:animate-bounce transition-transform"}
-                />
-                <MenuList>
-                  <MenuItem icon={<DeleteIcon />} color={"red.500"}>
-                    Delete Chat
-                  </MenuItem>
-                </MenuList>
-              </Menu>
-            </Box>
-          </Box>
+            <Divider w="95%" />
+          </>
         ))}
     </VStack>
   );

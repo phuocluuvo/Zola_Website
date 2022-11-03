@@ -1,6 +1,7 @@
 import {
   Avatar,
   AvatarBadge,
+  Badge,
   Box,
   Spinner,
   Text,
@@ -64,11 +65,12 @@ export default function ListUsers({ fetchAgain, setFetchAgain }) {
       <Box display={"flex"} justifyContent="space-between">
         <Text>Members:</Text>
         <Box display={"flex"} justifyContent="center" alignItems={"center"}>
-          <Avatar size="sm" src={selectedChat?.chatAdmin?.pic}>
-            <AvatarBadge borderColor="papayawhip" bg="yellow" boxSize="1em" />
-          </Avatar>
+          <Avatar size="sm" src={selectedChat?.chatAdmin?.pic}></Avatar>
           <ProfileModal user={selectedChat?.chatAdmin}>
             <Text ml="2">@{selectedChat?.chatAdmin?.username}</Text>
+            <Badge ml="1" colorScheme="yellow">
+              Admin
+            </Badge>
           </ProfileModal>
         </Box>
       </Box>

@@ -17,6 +17,7 @@ import {
   AlertDialogOverlay,
   Button,
   AlertDialogCloseButton,
+  Badge,
 } from "@chakra-ui/react";
 import axios from "axios";
 import React from "react";
@@ -115,6 +116,9 @@ function UserBadgeItem({
               >
                 @{_user?.username}
               </Text>
+              <Badge ml="1" colorScheme="gray">
+                Member
+              </Badge>
             </ProfileModal>
           </Box>
           {user._id === selectedChat.chatAdmin._id && (
@@ -164,12 +168,11 @@ function UserBadgeItem({
 
             <AlertDialogContent>
               <AlertDialogHeader>
-                Promte @{_user?.username} to Group Admin?
+                Promote @{_user?.username} to Group Admin?
               </AlertDialogHeader>
               <AlertDialogCloseButton />
               <AlertDialogBody>
-                Are you sure you want to discard all of your notes? 44 words
-                will be deleted.
+                Are your sure you want to promote this user to be a Group Admin?
               </AlertDialogBody>
               <AlertDialogFooter>
                 <Button ref={cancelRef} onClick={onClose}>
