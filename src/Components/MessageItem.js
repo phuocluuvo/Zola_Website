@@ -28,7 +28,7 @@ import {
   isSameUserMargin,
 } from "../logic/ChatLogic";
 import { ChatState } from "../providers/ChatProvider";
-
+import VideoPlayer from "./media/VideoPlayer";
 function MessageItem({ messages, setMessages, m, i }) {
   const [isHover, setIsHover] = useState(false);
   const toast = useToast();
