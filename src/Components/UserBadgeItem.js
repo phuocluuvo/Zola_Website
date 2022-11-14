@@ -34,8 +34,8 @@ function UserBadgeItem({
   console.log("UserBadgeItem is rendered");
   const { colorMode, toggleColorMode } = useColorMode();
   const bgColor = useColorModeValue(
-    "linear(to-b,whiteAlpha.900,#B1AEC6)",
-    "linear(to-b,#1E2B6F,#193F5F)"
+    "radial-gradient( circle farthest-corner at 10% 20%,  rgba(255,229,168,1) 0%, rgba(251,174,222,1) 100.7% )",
+    "radial-gradient( circle 610px at 5.2% 51.6%,  rgba(5,8,114,1) 0%, rgba(7,3,53,1) 97.5% )"
   );
   const { selectedChat, user } = ChatState();
   const toast = useToast();
@@ -51,7 +51,7 @@ function UserBadgeItem({
       };
       await axios
         .put(
-          `https://zolachatapp.herokuapp.com/api/chat/changeAdmin`,
+          `https://zolachatapp.herokuapp.com/chat/changeAdmin`,
           {
             chatId: selectedChat._id,
             userId: _user._id,
@@ -168,11 +168,12 @@ function UserBadgeItem({
 
             <AlertDialogContent>
               <AlertDialogHeader>
-                Promote @{_user?.username} to Group Admin?
+                Promte @{_user?.username} to Group Admin?
               </AlertDialogHeader>
               <AlertDialogCloseButton />
               <AlertDialogBody>
-                Are your sure you want to promote this user to be a Group Admin?
+                Are you sure you want to discard all of your notes? 44 words
+                will be deleted.
               </AlertDialogBody>
               <AlertDialogFooter>
                 <Button ref={cancelRef} onClick={onClose}>

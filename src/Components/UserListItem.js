@@ -1,42 +1,39 @@
-import { Avatar, Box, Text } from "@chakra-ui/react";
+import { Avatar, Box, Divider, Text, VStack } from "@chakra-ui/react";
 import React from "react";
 
 function UserListItem({ user, handleFunction }) {
   console.log("UserListIem is rendered");
   return (
-    <Box
-      onClick={handleFunction}
-      cursor="pointer"
-      bg="#E8E8E8"
-      _hover={{
-        background: "#38B2AC",
-        color: "whiteAlpha.900",
-      }}
-      w="100%"
-      display="flex"
-      alignItems="center"
-      color="black"
-      px={3}
-      py={2}
-      mb={2}
-      borderRadius="lg"
-    >
-      <Avatar
-        mr={2}
-        size="sm"
+    <VStack spacing={0} cursor="pointer" opacity={0.8} width="100%">
+      <Box
+        onClick={handleFunction}
+        className="transition-opacity pullRight"
         cursor="pointer"
-        name={user.username}
-        src={user.pic}
-      />
-      <Box>
-        <Text>@{user.username}</Text>
-        <Box>
+        position="relative"
+        display="flex"
+        alignItems={"center"}
+        justifyContent="space-between"
+        flex={1}
+        py="7px"
+        px="15px"
+        w="full"
+      >
+        <Avatar
+          mr={2}
+          size="md"
+          cursor="pointer"
+          name={user.username}
+          src={user.pic}
+        />
+        <Box flex="1">
+          <Text fontWeight={"bold"}>@{user.username}</Text>
           <Text fontSize="xs" className="truncate">
             Email: {user.email}
           </Text>
         </Box>
       </Box>
-    </Box>
+      <Divider w="95%" p="0" m="0" />
+    </VStack>
   );
 }
 

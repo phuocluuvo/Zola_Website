@@ -2,147 +2,44 @@ import {
   Avatar,
   Box,
   Button,
-  Divider,
-  Drawer,
-  DrawerBody,
-  DrawerCloseButton,
-  DrawerContent,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerOverlay,
   IconButton,
-  Input,
   Menu,
   MenuButton,
   MenuItem,
   MenuList,
-  Spinner,
   Text,
-  Tooltip,
   useColorMode,
   useColorModeValue,
-  useDisclosure,
-  useToast,
 } from "@chakra-ui/react";
-import {
-  AddIcon,
-  ArrowForwardIcon,
-  HamburgerIcon,
-  InfoIcon,
-  MoonIcon,
-  SearchIcon,
-  SunIcon,
-  ViewIcon,
-} from "@chakra-ui/icons";
+import { AddIcon, ViewIcon } from "@chakra-ui/icons";
 import React, { useState } from "react";
-import { motion } from "framer-motion";
 import ChatList from "./ChatsList";
 import { ChatState } from "../providers/ChatProvider";
-import { useNavigate } from "react-router-dom";
-import ProfileModal from "./ProfileModal";
-import UserListItem from "./UserListItem";
-import axios from "axios";
-import ChatLoading from "./loading/ChatLoading";
+
 import GroupChatModal from "./GroupChatModal";
-import DrawerMenuUser from "./DrawerMenuUser";
 
 function SideBar({ fetchAgain, setFetchAgain }) {
   const bg = useColorModeValue(
-    "linear(to-b,#C39A9E,#808293)",
+    "radial-gradient(circle, rgba(238,174,202,1) 0%, rgba(148,187,233,1) 100%)",
     "linear(to-t,blue.900,purple.900)"
   );
   const colorLoggedUser = useColorModeValue(
     "linear(to-b,whiteAlpha.900,#B1AEC6)",
     "linear(to-b,#1E2B6F,#193F5F)"
   );
+
   const {
     setCloseSideBar,
     user,
     setSelectedChat,
-    chats,
-    setChats,
+
     notification,
     setNotification,
   } = ChatState();
   const { colorMode, toggleColorMode } = useColorMode();
-  const [search, setSearch] = useState("");
-  const [searchResult, setSearchResult] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [loadingChat, setLoadingChat] = useState(false);
-  const { isOpen, onOpen, onClose } = useDisclosure();
 
-  const toast = useToast();
   const [isOn, setIsOn] = useState(false);
 
-  const toggleSwitch = () => setIsOn(!isOn);
-
-  const handleSearch = async () => {
-    if (!search) {
-      toast({
-        title: "Enter something to search",
-        status: "warning",
-        duration: 2500,
-        isClosable: true,
-        position: "top-left",
-      });
-      return;
-    }
-    try {
-      setLoading(true);
-      const config = {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      };
-      const { data } = await axios.get(
-        `https://zolachatapp.herokuapp.com/api/user?search=${search}`,
-        config
-      );
-      setLoading(false);
-      setSearchResult(data);
-    } catch (error) {
-      toast({
-        title: "Error Occured",
-        description: "Failed to load search results",
-        status: "error",
-        duration: 2500,
-        isClosable: true,
-        position: "top-left",
-      });
-    }
-  };
-
-  const accessChat = async (userId) => {
-    try {
-      setLoadingChat(true);
-      const config = {
-        headers: {
-          "Content-type": "application/json",
-          Authorization: `Bearer ${user.token}`,
-        },
-      };
-      const { data } = await axios.post(
-        `https://zolachatapp.herokuapp.com/api/chat`,
-        { userId },
-        config
-      );
-
-      if (!chats.find((c) => c._id === data._id)) setChats([data, ...chats]);
-
-      setSelectedChat(data);
-      setLoadingChat(false);
-      onClose();
-    } catch (error) {
-      toast({
-        title: "Failed to fetching chat",
-        description: error.message,
-        status: "error",
-        duration: 2500,
-        isClosable: true,
-        position: "top-left",
-      });
-    }
-  };
   console.log("SideBar is rendered");
   return (
     <>
@@ -268,72 +165,6 @@ function SideBar({ fetchAgain, setFetchAgain }) {
                     New Group Chat
                   </Button>
                 </GroupChatModal>
-
-                {/**button serch */}
-                <Tooltip
-                  label="Search users to chat with"
-                  hasArrow
-                  placement="bottom-end"
-                >
-                  <Button
-                    borderRadius={"full"}
-                    bgColor="transparent"
-                    onClick={onOpen}
-                    mx={1}
-                    w={{ base: "17px", md: "10px", lg: "17px" }}
-                  >
-                    <SearchIcon fontSize={"25px"} />
-                  </Button>
-                </Tooltip>
-
-                {/** Change theme (md) */}
-                <Box
-                  position={"absolute"}
-                  top={1}
-                  left={-14}
-                  display={{ base: "inline-block", md: "none" }}
-                >
-                  <div
-                    className={`${
-                      isOn ? "justify-end" : "justify-start"
-                    } w-[50px] h-[30px] bg-slate-400 flex rounded-full p-1 cursor-pointer `}
-                    onClick={toggleSwitch}
-                  >
-                    <motion.div
-                      className="handle w-[20px] flex justify-center items-center h-[20px]  rounded-full"
-                      layout
-                      transition={{
-                        type: "spring",
-                        stiffness: 700,
-                        damping: 30,
-                      }}
-                    >
-                      <IconButton
-                        variant={"ghost"}
-                        className="transition-opacity"
-                        borderRadius="full"
-                        onClick={toggleColorMode}
-                        transform="unset"
-                        _hover={{
-                          transform: "rotate(40deg)",
-
-                          color: "black",
-                          bgGradient:
-                            colorMode === "light"
-                              ? "linear(to-b,#C39A9E,#808293)"
-                              : "linear(to-b,#1E2B6F,#193F5F)",
-                        }}
-                        icon={
-                          colorMode === "light" ? (
-                            <MoonIcon textColor={"whiteAlpha.900"} />
-                          ) : (
-                            <SunIcon textColor={"yellow"} />
-                          )
-                        }
-                      />
-                    </motion.div>
-                  </div>
-                </Box>
               </Box>
             </Box>
             {/**view button */}
@@ -391,44 +222,6 @@ function SideBar({ fetchAgain, setFetchAgain }) {
           ></Box>
         </Box>
         <ChatList fetchAgain={fetchAgain} setFetchAgain={setFetchAgain} />
-        <Drawer
-          placement="left"
-          onClose={onClose}
-          isOpen={isOpen}
-          size={{ base: "full", md: "sm" }}
-        >
-          <DrawerOverlay />
-          <DrawerContent>
-            <DrawerCloseButton display={{ base: "inline-block", md: "none" }} />
-            <DrawerHeader borderBottomWidth="1px">Search User</DrawerHeader>
-            <DrawerBody>
-              <Box display="flex" pb={2}>
-                <Input
-                  placeholder="Search user by name or email to chat with"
-                  mr={2}
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                />
-                <Button onClick={handleSearch}>Go</Button>
-              </Box>
-              {loading ? (
-                <ChatLoading />
-              ) : searchResult.length > 0 ? (
-                searchResult?.map((user) => (
-                  <UserListItem
-                    key={user._id}
-                    user={user}
-                    handleFunction={() => accessChat(user._id)}
-                  />
-                ))
-              ) : (
-                <Text className="font-bold">¯\_(ツ)_/¯</Text>
-              )}
-              {loadingChat && <Spinner ml="auto" display="flex" />}
-            </DrawerBody>
-          </DrawerContent>
-          <DrawerFooter></DrawerFooter>
-        </Drawer>
       </Box>
       <Box
         className="scrollbar-thin  scrollbar-track-blue-900 scrollbar-thumb-slate-500"

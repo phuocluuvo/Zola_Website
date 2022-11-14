@@ -22,13 +22,26 @@ import {
   TabPanels,
   TabPanel,
   Box,
+  useEditableControls,
+  ButtonGroup,
+  Flex,
+  EditablePreview,
+  Editable,
+  EditableInput,
 } from "@chakra-ui/react";
 import React, { useState } from "react";
-import { HamburgerIcon } from "@chakra-ui/icons";
+import {
+  CheckIcon,
+  CloseIcon,
+  EditIcon,
+  HamburgerIcon,
+} from "@chakra-ui/icons";
 import { ChatState } from "../providers/ChatProvider";
 import axios from "axios";
 import UserListItem from "./UserListItem";
 import ListUsers from "./ListUsers";
+import { HiUserAdd, HiUserGroup } from "react-icons/hi";
+
 export default function DrawerInfoChat({ fetchAgain, setFetchAgain }) {
   const { colorMode } = useColorMode();
   const btnRef = React.useRef();
@@ -42,6 +55,29 @@ export default function DrawerInfoChat({ fetchAgain, setFetchAgain }) {
   const [tabIndex, setTabIndex] = useState(0);
 
   const { user, selectedChat, setSelectedChat } = ChatState();
+  function EditableControls() {
+    const {
+      isEditing,
+      getSubmitButtonProps,
+      getCancelButtonProps,
+      getEditButtonProps,
+    } = useEditableControls();
+
+    return isEditing ? (
+      <ButtonGroup justifyContent="center" size="sm">
+        <IconButton
+          icon={<CheckIcon />}
+          {...getSubmitButtonProps()}
+          onSubmit={handleRename}
+        />
+        <IconButton icon={<CloseIcon />} {...getCancelButtonProps()} />
+      </ButtonGroup>
+    ) : (
+      <Flex justifyContent="center">
+        <IconButton size="sm" icon={<EditIcon />} {...getEditButtonProps()} />
+      </Flex>
+    );
+  }
   const handleRemove = async (u) => {
     if (selectedChat.chatAdmin._id !== user._id && u._id !== user._id) {
       toast({
@@ -96,7 +132,7 @@ export default function DrawerInfoChat({ fetchAgain, setFetchAgain }) {
         },
       };
       const { data } = await axios.put(
-        "api/chat/rename",
+        "https://zolachatapp.herokuapp.com/api/chat/rename",
         {
           chatId: selectedChat._id,
           chatName: groupChatName,
@@ -217,7 +253,7 @@ export default function DrawerInfoChat({ fetchAgain, setFetchAgain }) {
             color: "black",
             bgGradient:
               colorMode === "light"
-                ? "linear(to-b,#C39A9E,#808293)"
+                ? "radial-gradient(circle, rgba(238,174,202,1) 0%, rgba(148,187,233,1) 100%)"
                 : "linear(to-b,#1E2B6F,#193F5F)",
           }}
           icon={
@@ -242,62 +278,45 @@ export default function DrawerInfoChat({ fetchAgain, setFetchAgain }) {
               right={{ base: 5, md: 10 }}
             />
             <DrawerHeader
-              mt={3}
+              mt={5}
               fontSize="25px"
               fontFamily="Work Sans"
               display="flex"
               justifyContent="center"
             >
-              {selectedChat?.chatName.toUpperCase()}
+              <Editable
+                textAlign="center"
+                defaultValue={selectedChat?.chatName.toUpperCase()}
+                onSubmit={handleRename}
+                fontSize="2xl"
+                display="flex"
+                alignItems={"center"}
+                justifyContent="center"
+                isPreviewFocusable={false}
+              >
+                <EditablePreview />
+                {/* Here is the custom input */}
+                <Input
+                  value={groupChatName}
+                  as={EditableInput}
+                  onChange={(e) => setGroupChatName(e.target.value)}
+                />
+                <EditableControls />
+              </Editable>
             </DrawerHeader>
             <DrawerBody>
               <Tabs onChange={(index) => setTabIndex(index)} variant="enclosed">
                 <TabList mb="1em">
                   <Tab>
-                    {tabIndex === 0 ? (
-                      <Text fontSize={13}>Change Group Name</Text>
-                    ) : (
-                      <i class="fas fa-pen-square"></i>
-                    )}
+                    {tabIndex === 0 && <HiUserAdd mx="2" />}
+                    <Text fontSize={13}>Add a User</Text>
                   </Tab>
                   <Tab>
-                    {tabIndex === 1 ? (
-                      <Text fontSize={13}>Add a User</Text>
-                    ) : (
-                      <>
-                        <i class="fa fa-users"></i>
-                        <i class="fa fa-plus" aria-hidden="true"></i>
-                      </>
-                    )}
-                  </Tab>
-                  <Tab>
-                    {tabIndex === 2 ? (
-                      <Text fontSize={13}>Group Members</Text>
-                    ) : (
-                      <i class="fa fa-users"></i>
-                    )}
+                    {tabIndex === 1 && <HiUserGroup mx="2" />}
+                    <Text fontSize={13}>Group Members</Text>
                   </Tab>
                 </TabList>
                 <TabPanels>
-                  <TabPanel>
-                    <FormControl>
-                      <FormLabel>Change Group Name</FormLabel>
-                      <Input
-                        placeholder="Chat Name"
-                        mb={3}
-                        value={groupChatName}
-                        onChange={(e) => setGroupChatName(e.target.value)}
-                      />
-                      <Button
-                        variant="solid"
-                        colorScheme="teal"
-                        isLoading={renameLoading}
-                        onClick={handleRename}
-                      >
-                        Update
-                      </Button>
-                    </FormControl>
-                  </TabPanel>
                   <TabPanel display={"flex"} flexDir="column">
                     <FormControl>
                       <FormLabel>Add User to Group</FormLabel>
@@ -337,6 +356,7 @@ export default function DrawerInfoChat({ fetchAgain, setFetchAgain }) {
               <Button
                 isDisabled={user._id === selectedChat?.chatAdmin._id}
                 colorScheme="red"
+                variant={colorMode === "dark" && "outline"}
                 onClick={() => {
                   handleRemove(user);
                   onClose();

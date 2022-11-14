@@ -1,15 +1,18 @@
-import React, { memo, useEffect } from "react";
+import React, { memo, useEffect, useState } from "react";
 import {
   Avatar,
   AvatarGroup,
+  Badge,
   Box,
   Divider,
+  HStack,
   IconButton,
   Menu,
   MenuButton,
   MenuItem,
   MenuList,
   Text,
+  useColorMode,
   useToast,
   VStack,
 } from "@chakra-ui/react";
@@ -17,14 +20,17 @@ import {
 import moment from "moment";
 import { ChatState } from "../providers/ChatProvider";
 import axios from "axios";
-import { getSender, getSenderInfo } from "../logic/ChatLogic";
+import { getSender, getSenderInfo, isExistInArray } from "../logic/ChatLogic";
 import io from "socket.io-client";
 import { ChevronDownIcon, DeleteIcon } from "@chakra-ui/icons";
 function ChatList({ fetchAgain, setFetchAgain }) {
   const { selectedChat, setSelectedChat, user, chats, setChats } = ChatState();
+  const { colorMode } = useColorMode();
+  const [friends, setFriends] = useState([]);
   const toast = useToast();
   useEffect(() => {
     fetchChats();
+    fetchFriends();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fetchAgain]);
   const fetchChats = async () => {
@@ -63,6 +69,42 @@ function ChatList({ fetchAgain, setFetchAgain }) {
       source.cancel();
     };
   };
+  const fetchFriends = async () => {
+    const CancelToken = axios.CancelToken;
+    const source = CancelToken.source();
+    try {
+      const config = {
+        headers: {
+          Authorization: `Bearer ${
+            JSON.parse(localStorage.getItem("userInfo")).token
+          }`,
+        },
+        cancelToken: source.token,
+      };
+      const { data } = await axios.get(
+        `https://zolachatapp.herokuapp.com/api/friends`,
+        config
+      );
+      if (user) setFriends(data);
+    } catch (error) {
+      if (axios.isCancel(error)) console.log("successfully aborted");
+      else {
+        console.log(error);
+        toast({
+          title: "Error Occured",
+          description: "Failed to load chats",
+          status: "error",
+          duration: 2500,
+          isClosable: true,
+          position: "bottom-left",
+        });
+      }
+    }
+    return () => {
+      // cancel the request before component unmounts
+      source.cancel();
+    };
+  };
   console.log("chatList is rendered");
   return (
     <VStack zIndex={1} mb={5} spacing="0">
@@ -76,11 +118,11 @@ function ChatList({ fetchAgain, setFetchAgain }) {
               alignItems="center"
               className="transition-colors "
               bgColor={
-                selectedChat
-                  ? selectedChat._id === chat._id
-                    ? "white"
-                    : ""
-                  : ""
+                selectedChat?._id !== chat?._id
+                  ? ""
+                  : colorMode === "light"
+                  ? "white"
+                  : "whiteAlpha.800"
               }
               mx={3}
             >
@@ -136,26 +178,40 @@ function ChatList({ fetchAgain, setFetchAgain }) {
                   ></Avatar>
                 )}
                 <Box flex="1" px="2" maxW="400px" w="0.5">
-                  <Text
-                    fontWeight={"bold"}
-                    textColor={
-                      selectedChat?._id === chat._id
-                        ? "black"
-                        : "whiteAlpha.900"
-                    }
-                    className="truncate"
-                  >
-                    {chat.isGroupChat
-                      ? chat.chatName
-                      : getSender(user, chat.users)}
-                  </Text>
+                  <HStack>
+                    <Text
+                      fontWeight={"bold"}
+                      textColor={
+                        selectedChat?._id === chat._id
+                          ? "black"
+                          : "whiteAlpha.900"
+                      }
+                      maxW={{ base: "fit-content", md: "250px" }}
+                      className="truncate"
+                      fontSize={{ base: "sm", md: "md" }}
+                    >
+                      {chat.isGroupChat
+                        ? chat.chatName
+                        : getSender(user, chat.users)}
+                    </Text>
+                    {!chat.isGroupChat &&
+                      isExistInArray(
+                        getSenderInfo(user, chat.users),
+                        friends
+                      ) === false && (
+                        <Badge colorScheme={"facebook"} fontSize="2xs" mx="2">
+                          Stranger
+                        </Badge>
+                      )}
+                  </HStack>
                   <Text
                     textColor={
                       selectedChat?._id === chat._id
                         ? "black"
                         : "whiteAlpha.500"
                     }
-                    w={{ base: "100%", md: "250px" }}
+                    w={{ base: "100%", md: "200px" }}
+                    fontSize={{ base: "sm", md: "md" }}
                     textOverflow={"ellipsis"}
                     overflow="hidden"
                     whiteSpace={"nowrap"}
@@ -185,7 +241,7 @@ function ChatList({ fetchAgain, setFetchAgain }) {
                       : "linear(to-br,white,white)"
                   }
                   textAlign={"right"}
-                  w={{ base: "200px", md: "100px" }}
+                  w={{ base: "fit-content", md: "100px" }}
                   p={{ base: "5", md: "1" }}
                 >
                   {moment(chat.latestMessage?.createdAt).fromNow()}

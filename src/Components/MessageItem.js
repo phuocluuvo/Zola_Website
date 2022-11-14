@@ -1,4 +1,4 @@
-import { ChatIcon, DeleteIcon } from "@chakra-ui/icons";
+import { ChatIcon, DeleteIcon, DownloadIcon } from "@chakra-ui/icons";
 import {
   Avatar,
   Box,
@@ -14,6 +14,7 @@ import {
   ModalOverlay,
   Text,
   Tooltip,
+  useColorMode,
   useDisclosure,
   useToast,
 } from "@chakra-ui/react";
@@ -34,6 +35,8 @@ function MessageItem({ messages, setMessages, m, i }) {
   const toast = useToast();
   const { user, selectedChat, setResponse } = ChatState();
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const { colorMode } = useColorMode();
+  const { file, setFile } = useState("");
 
   const fetchMessages = async () => {
     const CancelToken = axios.CancelToken;
@@ -50,6 +53,7 @@ function MessageItem({ messages, setMessages, m, i }) {
         config
       );
       setMessages(data);
+      setFile(data.multiFile);
     } catch (error) {
       if (axios.isCancel(error)) console.log("successfully aborted");
       else
@@ -108,7 +112,6 @@ function MessageItem({ messages, setMessages, m, i }) {
         key={m._id}
         marginBottom={1}
         display="flex"
-        textColor={"blackAlpha.900"}
         alignItems="center"
         position={"relative"}
         zIndex={0}
@@ -146,8 +149,16 @@ function MessageItem({ messages, setMessages, m, i }) {
           w={"fit-content"}
           borderRadius="10px"
           backgroundColor={`${
-            m.sender._id === user._id ? "#BEE3F8" : "whiteAlpha.900"
+            m.sender._id === user._id
+              ? colorMode === "light"
+                ? "#BEE3F8"
+                : "whiteAlpha.300"
+              : colorMode === "light"
+              ? "whiteAlpha.900"
+              : "whiteAlpha.300"
           }`}
+          border="1px solid"
+          borderColor={colorMode === "light" ? "transparent" : "whiteAlpha.900"}
           padding={m?.content ? "10px" : 0}
           marginLeft={isSameSenderMargin(messages, m, i, user._id)}
           marginTop={isSameUserMargin(messages, m, i, user._id) ? "auto" : 30}
@@ -157,7 +168,9 @@ function MessageItem({ messages, setMessages, m, i }) {
             <Box pos="relative">
               <Text
                 fontSize={"xs"}
-                color="blackAlpha.800"
+                textColor={
+                  colorMode === "light" ? "blackAlpha.900" : "whiteAlpha.900"
+                }
                 pos="relative"
                 top={0}
                 left={0}
@@ -173,21 +186,20 @@ function MessageItem({ messages, setMessages, m, i }) {
                 flexDir={"column"}
               >
                 <Text
-                  color="whiteAlpha.800"
+                  textColor={
+                    colorMode === "light" ? "blackAlpha.900" : "whiteAlpha.900"
+                  }
                   className="truncate"
                   maxW={"150px"}
                 >
                   {m.response?.content}
                 </Text>
-                {m?.multiMedia && (
+                {m.response?.multiMedia && (
                   <Image
-                    borderRadius={"md"}
-                    maxWidth="300px"
-                    maxHeight="450px"
-                    w="fit-content"
-                    h="fit-content"
+                    borderRadius={"sm"}
+                    boxSize="100px"
                     objectFit="cover"
-                    src={m?.multiMedia}
+                    src={m.response?.multiMedia}
                   />
                 )}
               </Box>
@@ -196,11 +208,20 @@ function MessageItem({ messages, setMessages, m, i }) {
           <Text
             fontSize={{ base: "sm", md: "md" }}
             width={"fit-content"}
+            color={
+              m.content === "deleted"
+                ? colorMode === "light"
+                  ? "gray.900"
+                  : "whiteAlpha.900"
+                : colorMode === "light"
+                ? "blackAlpha.900"
+                : "whiteAlpha.900"
+            }
             whiteSpace="pre-wrap"
-            color={m.content === "deleted" && "gray.600"}
             fontStyle={m.content === "deleted" && "italic"}
           >
             <ReactLinkify
+              component="button"
               properties={{
                 target: "_blank",
                 style: { color: "red", fontWeight: "bold" },
@@ -209,6 +230,25 @@ function MessageItem({ messages, setMessages, m, i }) {
               {m.content}
             </ReactLinkify>
           </Text>
+          {m.multiFile && (
+            <ReactLinkify
+              component="button"
+              properties={{
+                target: "_blank",
+                style: { color: "red", fontWeight: "bold" },
+              }}
+            >
+              {m.multiFile.endsWith("doc" || "txt" || "docx" || "dotx") &&
+                "A Document file:"}
+              {m.multiFile.endsWith("pdf") && "A Pdf file:"}
+              {m.multiFile.endsWith("xls") && "A Excel file:"}
+              {m.multiFile.endsWith("ppt" || "pptx" || "pot" || "ppsx") &&
+                "A Ppt file:"}
+              <Button as="a" href={m.multiFile} className="text-blue-600">
+                <DownloadIcon />
+              </Button>
+            </ReactLinkify>
+          )}
           {m?.multiMedia && (
             <Image
               borderRadius={"md"}
@@ -227,7 +267,9 @@ function MessageItem({ messages, setMessages, m, i }) {
               width={"fit-content"}
               fontSize={9}
               marginLeft={0}
-              textColor={"blackAlpha.900"}
+              textColor={
+                colorMode === "light" ? "blackAlpha.900" : "whiteAlpha.900"
+              }
             >
               {moment(m.createdAt).calendar()}
             </Text>

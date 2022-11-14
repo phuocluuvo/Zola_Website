@@ -13,7 +13,7 @@ export const getSender = (loggedUser, users) => {
  *
  * @param {User} loggedUser
  * @param {User[]} users
- * @returns a sender information
+ * @returns a sender information from a single chat
  */
 export const getSenderInfo = (loggedUser, users) => {
   return users[0]._id === loggedUser._id ? users[1] : users[0];
@@ -80,6 +80,14 @@ export const isSameSenderSendMessage = (messages, m, i) => {
  * @param {String} userId the loggedUser id
  * @return {Variable} integer number for margin purposes
  */
-export const isSameUserMargin = (messages, m, i, userId) => {
+export const isSameUserMargin = (messages, m, i) => {
   return i > 0 && messages[i - 1].sender._id === m.sender._id;
+};
+/**
+ * @description Check a user is exist in another user
+ * @param {User} user User to check if exist in the list
+ * @param {UserList} users list of user to check
+ */
+export const isExistInArray = (user, users) => {
+  return users.find((u) => u._id === user._id)?._id ? true : false;
 };

@@ -1,24 +1,18 @@
-import {
-  ChevronLeftIcon,
-  CloseIcon,
-  Icon,
-  MoonIcon,
-  PhoneIcon,
-  SunIcon,
-} from "@chakra-ui/icons";
+import { ChevronLeftIcon, CloseIcon } from "@chakra-ui/icons";
 import {
   Avatar,
   AvatarBadge,
   AvatarGroup,
   Box,
-  Button,
   Fade,
   FormControl,
+  Icon,
   IconButton,
   Image,
   Input,
   InputGroup,
-  InputRightElement,
+  InputLeftAddon,
+  InputRightAddon,
   Spinner,
   Text,
   Textarea,
@@ -30,25 +24,25 @@ import {
 } from "@chakra-ui/react";
 import EmojiPicker, { Theme } from "emoji-picker-react";
 import axios from "axios";
-
+import Lottie from "react-lottie";
 import io from "socket.io-client";
 import React, { useEffect, useRef, useState } from "react";
 import { getSender, getSenderInfo } from "../logic/ChatLogic";
 import { ChatState } from "../providers/ChatProvider";
 import MessageList from "./MessageList";
-import { motion } from "framer-motion";
-import animationData from "../animations/52671-typing-animation-in-chat.json";
+import animationData from "../animations/81154-typing-in-chat.json";
 import UpdateGroupChatModal from "./UpdateGroupChatModal";
-import ProfileModal from "./ProfileModal";
 import moment from "moment";
 import useMessagePagination from "../hooks/useMessagePagination";
 import DrawerInfoChat from "./DrawerInfoChat";
 import DrawerInfoUser from "./DrawerInfoUser";
+import { IoResize } from "react-icons/io5";
 import { RiSendPlaneFill } from "react-icons/ri";
 import { AiFillSmile } from "react-icons/ai";
 import { MdAddPhotoAlternate } from "react-icons/md";
-import Lottie from "react-lottie";
-import { IoResize, IoResizeOutline } from "react-icons/io5";
+import UploadMenuButton from "./UploadMenuButton";
+import AddFriendButton from "./AddFriendButton";
+import { HiVideoCamera } from "react-icons/hi";
 
 const ENDPOINT = "https://zolachatapp.herokuapp.com";
 
@@ -60,7 +54,6 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
     "linear(to-b,#1E2B6F,#193F5F)"
   );
   const [loadingNewMessage, setLoadingNewMessage] = useState(false);
-  const [toggleExpand, setToggleExpand] = useState(false);
   const [loading, setLoading] = useState(false);
   const [newMessage, setNewMessage] = useState("");
   const [socketConnected, setSocketConnected] = useState(false);
@@ -86,7 +79,11 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
     useMessagePagination(user, selectedChat, pageNumber);
   const [toggle, setToggle] = useState(false);
   const [pic, setPic] = useState("");
+  const [video, setVideo] = useState("");
+  const [file, setFile] = useState("");
   const [loadingPic, setLoadingPic] = useState(false);
+  const [toggleExpand, setToggleExpand] = useState(false);
+
   const fetchMessages = async () => {
     if (!selectedChat) return;
     const CancelToken = axios.CancelToken;
@@ -128,7 +125,7 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
     };
   };
   const inputRef = useRef(null);
-  const selectChange = (event) => {
+  const selectImageChange = (event) => {
     const picture = event.target.files && event.target.files[0];
     if (!picture) {
       return;
@@ -147,11 +144,66 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
         .then((res) => res.json())
         .then((data) => {
           setPic(data.url.toString());
+          console.log("STRING");
+          console.log(data.url.toString());
           setLoadingPic(false);
         })
         .catch((err) => {
-          console.log(err);
           setLoadingPic(false);
+        });
+    }
+  };
+  const selectVideoChange = (event) => {
+    const video = event.target.files[0];
+    if (!video) {
+      return;
+    }
+    if (video) {
+      const data = new FormData();
+      console.log(video);
+      data.append("file", video);
+      data.append("upload_preset", "chat-chit");
+      data.append("cloud_name", "voluu");
+      fetch("https://api.cloudinary.com/v1_1/voluu/video/upload", {
+        method: "POST",
+        body: data,
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          setVideo(data.url.toString());
+          console.log(data);
+          console.log(data.url.toString());
+          setLoading(false);
+        })
+        .catch((err) => {
+          setLoading(false);
+        });
+    }
+  };
+  const selectFileChange = (event) => {
+    const file = event.target.files[0];
+    if (!file) {
+      return;
+    }
+    if (file) {
+      const data = new FormData();
+      console.log(file);
+      data.append("file", file);
+      data.append("upload_preset", "chat-chit");
+      data.append("cloud_name", "voluu");
+      fetch("https://api.cloudinary.com/v1_1/voluu/raw/upload", {
+        method: "POST",
+        body: data,
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          setFile(data.url.toString());
+          console.log(data);
+          console.log(data.url.toString());
+          setLoading(false);
+        })
+        .catch((err) => {
+          setLoading(false);
         });
     }
   };
@@ -176,6 +228,8 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
             "https://zolachatapp.herokuapp.com/api/message",
             {
               multiMedia: pic,
+              multiFile: file,
+              multiVideo: video,
               content: newMessage,
               chatId: selectedChat._id,
               response: response,
@@ -184,6 +238,8 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
           )
           .then((data) => {
             setPic("");
+            setVideo("");
+            setFile("");
             setResponse(null);
             socket.emit("new message", data.data);
             console.log(data.data);
@@ -209,7 +265,6 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
     if (e.keyCode === 13 && e.shiftKey) {
       setNewMessage(newMessage + "&#13");
     } else setNewMessage(e.target.value);
-    setNewMessage(e.target.value);
     if (!socketConnected) return;
     //if user is typing
     if (!typing) {
@@ -298,7 +353,7 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
     console.log("");
     socket.on("answer", (id) => {
       const win = window.open(
-        "https://zolachatapp.netlify.app/call/" + id + "/" + id,
+        "https://zolachatapp.netlify.app/call/" + answer,
         "Call",
         "toolbar=yes,scrollbars=yes,resizable=yes,top=50,left=70,width=1200,height=600"
       );
@@ -310,19 +365,14 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
       w="full"
       h="full"
       bgImage={
-        selectedChat
+        selectedChat && colorMode === "light"
           ? selectedChat.isGroupChat
             ? selectedChat.chatAdmin.pic
             : `url(${getSenderInfo(user, selectedChat.users).pic})`
-          : "initial"
+          : "linear-gradient( 94.3deg,  rgba(26,33,64,1) 10.9%, rgba(81,84,115,1) 87.1% )"
       }
-      bgColor={useColorModeValue(
-        "linear(to-b,whiteAlpha.900,#B1AEC6)",
-        "linear(to-b,#1E2B6F,#193F5F)"
-      )}
-      bgRepeat="no-repeat"
-      bgPosition={"center"}
-      bgSize="cover"
+      bgRepeat="repeat"
+      bgSize="contain"
       position="relative"
     >
       {!selectedChat ? (
@@ -468,7 +518,12 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                       </div>
                     ) : (
                       <>
-                        <Text>{getSender(user, selectedChat.users)}</Text>
+                        <AddFriendButton
+                          user={user}
+                          friend={getSenderInfo(user, selectedChat.users)}
+                          selectedChat={selectedChat}
+                        />
+
                         <Text fontWeight={"normal"} opacity={0.8}>
                           {getSenderInfo(user, selectedChat.users).statusOnline
                             ? "online"
@@ -491,74 +546,31 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                   display="flex"
                   alignItems={"center"}
                 >
-                  <IconButton
-                    onClick={() => {
-                      window.open(
-                        "https://zolachatapp.netlify.app/call/null" +
-                          getSenderInfo(user, selectedChat.users)._id,
-                        "Call Video",
-                        "toolbar=yes,scrollbars=yes,resizable=yes,top=50,left=70,width=1200,height=600"
-                      );
-                      callMess();
-                    }}
-                    variant={"ghost"}
-                    className="transition-opacity"
-                    borderRadius="full"
-                    bgColor="transparent"
-                    _hover={{
-                      color: "black",
-                    }}
-                    icon={
-                      colorMode === "dark" ? (
-                        <PhoneIcon textColor={"whiteAlpha.900"} />
-                      ) : (
-                        <PhoneIcon textColor={"yellow"} />
-                      )
-                    }
-                  />
-                  <div
-                    className={`${
-                      isOn ? "justify-end" : "justify-start"
-                    } w-[50px] h-[30px] bg-slate-400 flex rounded-full p-1 cursor-pointer 
-                    `}
-                    onClick={() => {
-                      toggleSwitch();
-                      toggleColorMode();
-                    }}
-                  >
-                    <motion.div
-                      className="handle w-[20px] flex justify-center items-center h-[20px]  rounded-full"
-                      layout
-                      transition={{
-                        type: "spring",
-                        stiffness: 700,
-                        damping: 20,
+                  <Tooltip label={"Make a video call"} hasArrow>
+                    <IconButton
+                      onClick={() => {
+                        window.open(
+                          "https://zolachatapp.herokuapp.com/call/null",
+                          "Call",
+                          "toolbar=yes,scrollbars=yes,resizable=yes,top=50,left=70,width=1200,height=600"
+                        );
+                        callMess();
                       }}
-                      onClick={toggleColorMode}
-                    >
-                      <IconButton
-                        variant={"ghost"}
-                        className="transition-opacity"
-                        borderRadius="full"
-                        transform="unset"
-                        _hover={{
-                          transform: "rotate(40deg)",
-                          color: "black",
-                          bgGradient:
-                            colorMode === "light"
-                              ? "linear(to-b,#C39A9E,#808293)"
-                              : "linear(to-b,#1E2B6F,#193F5F)",
-                        }}
-                        icon={
-                          colorMode === "light" ? (
-                            <MoonIcon textColor={"whiteAlpha.900"} />
-                          ) : (
-                            <SunIcon textColor={"yellow"} />
-                          )
-                        }
-                      />
-                    </motion.div>
-                  </div>
+                      variant={"ghost"}
+                      className="transition-opacity"
+                      borderRadius="full"
+                      bgColor="transparent"
+                      _hover={{
+                        color: "black",
+                      }}
+                      icon={
+                        <HiVideoCamera
+                          fontSize={"24"}
+                          color={colorMode === "light" ? "white" : "yellow"}
+                        />
+                      }
+                    />
+                  </Tooltip>
 
                   <DrawerInfoChat
                     fetchAgain={fetchAgain}
@@ -581,7 +593,7 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                   isRequired
                   bottom={0}
                   left={0}
-                  pos={{ base: "relative", md: "unset" }}
+                  pos={"relative"}
                 >
                   {isTyping ? (
                     <Fade in={onToggle}>
@@ -590,16 +602,15 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                         border={"1px solid black"}
                         display="flex"
                         pos="absolute"
-                        bottom={0}
                         top={-9}
                         alignItems="center"
                         className="backdrop-blur-lg bg-opacity-50"
                         bgColor={"blackAlpha.800"}
                         borderRadius={"full"}
                         roundedBottomLeft={0}
-                        p={1}
+                        p={2}
+                        px={4}
                       >
-                        {" "}
                         <Text
                           mixBlendMode={"difference"}
                           textColor="whiteAlpha.900"
@@ -671,7 +682,6 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                       theme={colorMode ? Theme.DARK : Theme.LIGHT}
                     />
                   </Box>
-
                   {pic && (
                     <>
                       <Image
@@ -697,10 +707,11 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                       ></IconButton>
                     </>
                   )}
-                  <Box
+
+                  <InputGroup
                     display={"flex"}
                     alignItems={"center"}
-                    bg="whiteAlpha.900"
+                    bg={colorMode === "light" ? "white" : "whiteAlpha.800"}
                     py="2"
                   >
                     {response && (
@@ -735,26 +746,35 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                         </Box>
                       </Box>
                     )}
+                    <InputRightAddon bg="transparent" border="none">
+                      <UploadMenuButton
+                        inputRef={inputRef}
+                        selectVideoChange={selectVideoChange}
+                        selectFileChange={selectFileChange}
+                      />
+                    </InputRightAddon>
                     <Box flex={1} pos="relative">
                       <Textarea
-                        className="scrollbar-thin scrollbar-thumb-dark-blue"
+                        className={`crollbar-thin scrollbar-thumb-dark-blue
+                        ${
+                          colorMode === "light"
+                            ? "white"
+                            : "bg-white bg-opacity-50"
+                        }
+                            focus:bg-opacity-50`}
                         disabled={loadingNewMessage}
                         variant="outline"
-                        bg="whiteAlpha.900"
-                        textColor={"black"}
-                        placeholder="Type something..."
-                        value={newMessage}
-                        h="20"
+                        border="none"
                         rows={1}
                         maxH="80"
                         minH="10"
                         height={!toggleExpand ? 10 : 80}
                         autosize
+                        textColor={"black"}
+                        placeholder="Type something..."
+                        value={newMessage}
                         rounded={"sm"}
                         onChange={typingHandler}
-                        _focus={{
-                          opacity: 0.5,
-                        }}
                       />
                       <IconButton
                         variant={"ghost"}
@@ -767,7 +787,7 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                         _hover={{
                           bgGradient:
                             colorMode === "light"
-                              ? "linear(to-b,#C39A9E,#808293)"
+                              ? "radial-gradient(circle, rgba(238,174,202,1) 0%, rgba(148,187,233,1) 100%)"
                               : "linear(to-b,#1E2B6F,#193F5F)",
                         }}
                         pos="absolute"
@@ -777,53 +797,47 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                         onClick={() => setToggleExpand(!toggleExpand)}
                       />
                     </Box>
-                    <Box
-                      w={"12rem"}
-                      height={"full"}
+                    <InputLeftAddon
+                      bg="transparent"
+                      border={"transparent"}
+                      w={{ base: "8rem", md: "12rem" }}
                       display="flex"
-                      alignItems={"center"}
                       justifyContent={"space-evenly"}
                     >
                       <Input
                         accept="image/*"
-                        id="icon-button-file"
+                        id="icon-button-image"
                         type="file"
-                        className="hidden"
+                        hidden
                         ref={inputRef}
-                        onChange={selectChange}
+                        onChange={(e) => selectImageChange(e)}
                       />
-                      <Tooltip
-                        label={
-                          !loadingPic ? "Attach an image" : "Uploading image"
-                        }
-                        isOpen={loadingPic}
-                      >
-                        <label htmlFor="icon-button-file">
-                          <IconButton
-                            icon={
-                              <Icon
-                                color={
-                                  colorMode === "light"
-                                    ? "blackAlpha.800"
-                                    : "white"
-                                }
-                                as={MdAddPhotoAlternate}
-                                w="8"
-                                h="8"
-                              />
-                            }
-                            w="10"
-                            h="10"
-                            rounded="full"
-                            bgGradient={
-                              colorMode !== "light"
-                                ? "linear-gradient(to top right, #1E2B6F, #193F5F)"
-                                : "unset"
-                            }
-                            _hover={{ opacity: 0.8 }}
-                          />
-                        </label>
-                      </Tooltip>
+                      <label htmlFor="icon-button-image">
+                        <IconButton
+                          icon={
+                            <Icon
+                              color={
+                                colorMode === "light"
+                                  ? "blackAlpha.800"
+                                  : "whiteAlpha.800"
+                              }
+                              as={MdAddPhotoAlternate}
+                              w={{ base: "4", md: "6" }}
+                              h={{ base: "4", md: "6" }}
+                            />
+                          }
+                          as={"span"}
+                          h={{ base: "6", md: "8" }}
+                          w={{ base: "6", md: "8" }}
+                          rounded="full"
+                          bgGradient={
+                            colorMode !== "light"
+                              ? "linear-gradient(to top right, #1E2B6F, #193F5F)"
+                              : "unset"
+                          }
+                          _hover={{ opacity: 0.8 }}
+                        />
+                      </label>
 
                       <IconButton
                         icon={
@@ -832,10 +846,12 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                               colorMode === "light" ? "blackAlpha.800" : "white"
                             }
                             as={AiFillSmile}
-                            w="8"
-                            h="8"
+                            w={{ base: "4", md: "6" }}
+                            h={{ base: "4", md: "6" }}
                           />
                         }
+                        h={{ base: "6", md: "8" }}
+                        w={{ base: "6", md: "8" }}
                         rounded="full"
                         bgGradient={
                           colorMode !== "light"
@@ -845,30 +861,39 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                         _hover={{ opacity: 0.8 }}
                         onClick={() => setToggle(!toggle)}
                       />
-                      <IconButton
-                        icon={
-                          <Icon
-                            color={
-                              colorMode === "light" ? "blackAlpha.800" : "white"
-                            }
-                            as={RiSendPlaneFill}
-                            w="8"
-                            h="8"
-                          />
+                      <Tooltip
+                        label={
+                          !loadingPic ? "Attach an image" : "Uploading file"
                         }
-                        w="10"
-                        h="10"
-                        rounded="full"
-                        bgGradient={
-                          colorMode !== "light"
-                            ? "linear-gradient(to top right, #1E2B6F, #193F5F)"
-                            : "unset"
-                        }
-                        _hover={{ opacity: 0.8 }}
-                        onClick={() => sendMessage("Send")}
-                      />
-                    </Box>
-                  </Box>
+                        isOpen={loadingPic}
+                      >
+                        <IconButton
+                          icon={
+                            <Icon
+                              color={
+                                colorMode === "light"
+                                  ? "blackAlpha.800"
+                                  : "white"
+                              }
+                              as={RiSendPlaneFill}
+                              w={{ base: "4", md: "6" }}
+                              h={{ base: "4", md: "6" }}
+                            />
+                          }
+                          h={{ base: "6", md: "8" }}
+                          w={{ base: "6", md: "8" }}
+                          rounded="full"
+                          bgGradient={
+                            colorMode !== "light"
+                              ? "linear-gradient(to top right, #1E2B6F, #193F5F)"
+                              : "unset"
+                          }
+                          _hover={{ opacity: 0.8 }}
+                          onClick={() => sendMessage("Send")}
+                        />
+                      </Tooltip>
+                    </InputLeftAddon>
+                  </InputGroup>
                 </FormControl>
               </Box>
             )}

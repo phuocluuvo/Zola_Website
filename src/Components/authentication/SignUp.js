@@ -16,13 +16,19 @@ import {
   Text,
   useToast,
   VStack,
+  InputRightElement,
+  HStack,
+  Avatar,
 } from "@chakra-ui/react";
 
 import axios from "axios";
 import OtpInput from "react-otp-input";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AtSignIcon, EmailIcon } from "@chakra-ui/icons";
+import { HiCheck } from "react-icons/hi";
+import { FcCancel } from "react-icons/fc";
+import { MdPassword } from "react-icons/md";
 function SignUp({ setShow }) {
   const [fullname, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -30,7 +36,7 @@ function SignUp({ setShow }) {
   const [username, setUsername] = useState("");
   const [confirmpassword, setConfirmPassword] = useState("");
   const [pic, setPic] = useState("");
-
+  const inputRef = useRef(null);
   const [loading, setLoading] = useState(false);
   const toast = useToast();
   const [OTP, setOTP] = useState({ otp: "" });
@@ -104,7 +110,7 @@ function SignUp({ setShow }) {
       });
       return;
     }
-
+    inputRef.current.value = null;
     try {
       const config = {
         headers: {
@@ -182,106 +188,268 @@ function SignUp({ setShow }) {
       })
       .catch((err) => console.log(err));
   };
+
+  const [emailExist, setEmailExist] = useState(true);
+  async function handlerSearchEmail(query) {
+    const CancelToken = axios.CancelToken;
+    const source = CancelToken.source();
+    setEmail(query);
+    if (!query) {
+      setEmailExist(true);
+      return;
+    }
+    if (
+      /^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(
+        query
+      )
+    )
+      try {
+        const config = {
+          headers: {
+            "Content-type": "application/json",
+          },
+          cancelToken: source.token,
+        };
+        await axios
+          .post(
+            "https://zolachatapp.herokuapp.com/api/user/checkemail/:email",
+            { email: query },
+            config
+          )
+          .then((data) => {
+            if (data.data.email) setEmailExist(true);
+            else setEmailExist(false);
+          });
+      } catch (error) {
+        if (axios.isCancel(error)) console.log("successfully aborted");
+      }
+    else setEmailExist(true);
+    return () => {
+      source.cancel();
+    };
+  }
+  const [usernameExist, setUsernameExist] = useState(true);
+
+  async function handlerSearchUsername(query) {
+    const CancelToken = axios.CancelToken;
+    const source = CancelToken.source();
+    setUsername(query);
+    if (!query) {
+      setUsernameExist(true);
+      return;
+    }
+    if (
+      /^[a-zA-Z0-9]([._-](?![._-])|[a-zA-Z0-9]){3,18}[a-zA-Z0-9]$/.test(
+        username
+      )
+    )
+      try {
+        const config = {
+          headers: {
+            "Content-type": "application/json",
+          },
+          cancelToken: source.token,
+        };
+        await axios
+          .post(
+            "https://zolachatapp.herokuapp.com/api/user/checkusername/:username",
+            { username: username },
+            config
+          )
+          .then((data) => {
+            console.log(data.data.username);
+            if (data.data.username) setUsernameExist(true);
+            else setUsernameExist(false);
+          });
+      } catch (error) {
+        if (axios.isCancel(error)) console.log("successfully aborted");
+      }
+    else {
+      setUsernameExist(true);
+    }
+    return () => {
+      source.cancel();
+    };
+  }
+
   return (
     <ScaleFade initialScale={0.9} in={!isOpen}>
-      <VStack marginY={"1.5rem"} zIndex={10} spacing={5} align="stretch">
-        <InputGroup size="md" mb={0} h={45}>
-          <InputLeftElement
-            display={"flex"}
-            justifyContent="center"
-            alignItems={"center"}
-          >
-            <AtSignIcon color={"blackAlpha.900"} />
-          </InputLeftElement>
+      <HStack align="stretch" marginY={"1.5rem"}>
+        <VStack>
+          <Avatar size="xl" name={fullname} src={pic} />
           <Input
-            type={"name"}
-            value={username}
-            placeholder="Enter your username"
-            onChange={(e) => setUsername(e.target.value)}
-            bgColor={"whiteAlpha.900"}
-            borderRadius="lg"
-            textColor={username ? "blackAlpha.800" : "gray.500"}
+            type="file"
+            accept="image/*"
+            hidden
+            ref={inputRef}
+            id="avatar"
+            onChange={(e) => postDetails(e.target.files[0])}
           />
-        </InputGroup>
-        <InputGroup size="md" mb={0} h={45}>
-          <InputLeftElement
-            display={"flex"}
-            justifyContent="center"
-            alignItems={"center"}
-          >
-            <Text fontWeight={"bold"}>n</Text>
-          </InputLeftElement>
-          <Input
-            type={"name"}
-            value={fullname}
-            placeholder="Enter your full name"
-            onChange={(e) => setName(e.target.value)}
-            bgColor={"whiteAlpha.900"}
-            borderRadius="lg"
-            textColor={fullname ? "blackAlpha.800" : "gray.500"}
-          />
-        </InputGroup>
-        <InputGroup size="md" mb={0} h={45}>
-          <InputLeftElement
-            display={"flex"}
-            justifyContent="center"
-            alignItems={"center"}
-          >
-            <EmailIcon color={"blackAlpha.900"} />
-          </InputLeftElement>
-          <Input
-            type={"email"}
-            value={email}
-            placeholder="Enter your Email"
-            onChange={(e) => setEmail(e.target.value)}
-            bgColor={"whiteAlpha.900"}
-            borderRadius="lg"
-            textColor={email ? "blackAlpha.800" : "gray.500"}
-          />
-        </InputGroup>
-        <InputGroup size="md" mb={0} h={45}>
-          <InputLeftElement
-            display={"flex"}
-            justifyContent="center"
-            alignItems={"center"}
-          >
-            <i class="fas fa-key" aria-hidden="true"></i>
-          </InputLeftElement>
-          <Input
-            type={"password"}
-            placeholder="Enter your Password"
-            onChange={(e) => setPassword(e.target.value)}
-            value={password}
-            bgColor={"whiteAlpha.900"}
-            borderRadius="lg"
-            textColor={password ? "blackAlpha.800" : "gray.500"}
-          />
-        </InputGroup>
-        <InputGroup size="md" mb={0} h={45}>
-          <InputLeftElement
-            display={"flex"}
-            justifyContent="center"
-            alignItems={"center"}
-          >
-            <i class="fas fa-key" aria-hidden="true"></i>
-          </InputLeftElement>
-          <Input
-            type={"password"}
-            placeholder="Confirm your Password"
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            value={confirmpassword}
-            bgColor={"whiteAlpha.900"}
-            borderRadius="lg"
-            textColor={password ? "blackAlpha.800" : "gray.500"}
-          />
-        </InputGroup>
-        <Input
-          type="file"
-          accept="image/*"
-          p="1.5"
-          onChange={(e) => postDetails(e.target.files[0])}
-        />
-      </VStack>
+          <Box as="label" htmlFor="avatar" cursor="pointer">
+            <Button as="span">
+              {pic || fullname ? "Change" : "Select"} Avatar
+            </Button>
+          </Box>
+        </VStack>
+        <VStack zIndex={10} spacing={2} align="stretch">
+          <HStack align="stretch">
+            <Box>
+              <InputGroup size="md" mb={0} h={45}>
+                <InputLeftElement
+                  display={"flex"}
+                  justifyContent="center"
+                  alignItems={"center"}
+                >
+                  <AtSignIcon color={"blackAlpha.900"} />
+                </InputLeftElement>
+                <Input
+                  type={"name"}
+                  value={username}
+                  isInvalid={usernameExist || !username}
+                  errorBorderColor="crimson"
+                  placeholder="Enter your username"
+                  onChange={(e) => {
+                    handlerSearchUsername(e.target.value);
+                  }}
+                  bgColor={"whiteAlpha.900"}
+                  borderRadius="lg"
+                  textColor={username ? "blackAlpha.800" : "gray.500"}
+                />{" "}
+                <InputRightElement>
+                  {usernameExist || !username ? (
+                    <FcCancel color="red" />
+                  ) : (
+                    <HiCheck color="green" />
+                  )}
+                </InputRightElement>
+              </InputGroup>
+              {(usernameExist || !username) && (
+                <Text color={"red.500"}>username not availible</Text>
+              )}
+            </Box>
+            <InputGroup size="md" mb={0} h={45}>
+              <InputLeftElement
+                display={"flex"}
+                justifyContent="center"
+                alignItems={"center"}
+              >
+                <Text fontWeight={"bold"}>n</Text>
+              </InputLeftElement>
+              <Input
+                type={"name"}
+                value={fullname}
+                placeholder="Enter your full name"
+                onChange={(e) => setName(e.target.value)}
+                bgColor={"whiteAlpha.900"}
+                borderRadius="lg"
+                textColor={fullname ? "blackAlpha.800" : "gray.500"}
+              />
+            </InputGroup>
+          </HStack>
+          <Box>
+            <InputGroup size="md" mb={0} h={45}>
+              <InputLeftElement
+                display={"flex"}
+                justifyContent="center"
+                alignItems={"center"}
+              >
+                <EmailIcon color={"blackAlpha.900"} />
+              </InputLeftElement>
+              <Input
+                type={"email"}
+                value={email}
+                placeholder="Enter your Email"
+                isInvalid={emailExist}
+                color={emailExist ? "tomato" : "black"}
+                errorBorderColor="crimson"
+                onChange={(e) => {
+                  handlerSearchEmail(e.target.value);
+                }}
+                bgColor={"whiteAlpha.900"}
+                borderRadius="lg"
+                textColor={email ? "blackAlpha.800" : "gray.500"}
+              />{" "}
+              <InputRightElement>
+                {emailExist ? (
+                  <FcCancel color="red" />
+                ) : (
+                  <HiCheck color="green" />
+                )}
+              </InputRightElement>
+            </InputGroup>
+            {(emailExist || !email) && (
+              <Text color={"red.500"}>email not availible</Text>
+            )}
+          </Box>
+          <VStack>
+            <InputGroup size="md" mb={0} h={45}>
+              <InputLeftElement
+                display={"flex"}
+                justifyContent="center"
+                alignItems={"center"}
+              >
+                <MdPassword />
+              </InputLeftElement>
+              <Input
+                type={"password"}
+                placeholder="Enter your Password"
+                onChange={(e) => setPassword(e.target.value)}
+                value={password}
+                isInvalid={password !== confirmpassword || !password}
+                color={password !== confirmpassword ? "tomato" : "black"}
+                errorBorderColor="crimson"
+                bgColor={"whiteAlpha.900"}
+                borderRadius="lg"
+                textColor={password ? "blackAlpha.800" : "gray.500"}
+              />
+              <InputRightElement>
+                {password !== confirmpassword || !password ? (
+                  <FcCancel color="red" />
+                ) : (
+                  <HiCheck color="green" />
+                )}
+              </InputRightElement>
+            </InputGroup>
+          </VStack>
+          <Box>
+            <InputGroup size="md" mb={0} h={45}>
+              <InputLeftElement
+                display={"flex"}
+                justifyContent="center"
+                alignItems={"center"}
+              >
+                <MdPassword />
+              </InputLeftElement>
+              <Input
+                type={"password"}
+                placeholder="Confirm your Password"
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                value={confirmpassword}
+                isInvalid={password !== confirmpassword || !password}
+                color={
+                  password !== confirmpassword || !password ? "tomato" : "black"
+                }
+                bgColor={"whiteAlpha.900"}
+                borderRadius="lg"
+                textColor={password ? "blackAlpha.800" : "gray.500"}
+              />
+              <InputRightElement>
+                {password !== confirmpassword || !password ? (
+                  <FcCancel color="red" />
+                ) : (
+                  <HiCheck color="green" />
+                )}
+              </InputRightElement>
+            </InputGroup>
+            {password !== confirmpassword ||
+              ((!password || !confirmpassword) && (
+                <Text color={"red.500"}>
+                  Password and Password to confirm must be the same
+                </Text>
+              ))}
+          </Box>
+        </VStack>{" "}
+      </HStack>
       <Box zIndex={10}>
         <Button
           variant={"link"}
@@ -294,10 +462,18 @@ function SignUp({ setShow }) {
             bgClip: "text",
             bgGradient: "linear(to-br,red.600,yellow.600)",
           }}
+          w="full"
           mb="5"
           onClick={onOpen}
           isLoading={loading}
-          isDisabled={!email || !confirmpassword || !password || !username}
+          isDisabled={
+            !email ||
+            emailExist ||
+            usernameExist ||
+            !confirmpassword ||
+            !password ||
+            !username
+          }
         >
           Sign Up
         </Button>

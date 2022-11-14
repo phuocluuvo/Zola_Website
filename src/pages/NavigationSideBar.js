@@ -1,13 +1,15 @@
 import {
   ArrowForwardIcon,
   ChatIcon,
-  EditIcon,
-  HamburgerIcon,
   InfoIcon,
+  MoonIcon,
+  SearchIcon,
   SettingsIcon,
+  SunIcon,
 } from "@chakra-ui/icons";
 import {
   Avatar,
+  Box,
   Button,
   HStack,
   Icon,
@@ -27,25 +29,28 @@ import { ChatState } from "../providers/ChatProvider";
 import { motion, useAnimation } from "framer-motion";
 import { MdOutlineFeaturedPlayList } from "react-icons/md";
 import ProfileModal from "../Components/ProfileModal";
-export default function NavigationSideBar() {
+import DrawerSearchUser from "../Components/DrawerSearchUser";
+export default function NavigationSideBar({ display, setIsDisplay }) {
   const { user } = ChatState();
+  const toggleSwitch = () => setIsOn(!isOn);
+  const [isOn, setIsOn] = useState(false);
+
   const [isHover, setHover] = useState(false);
   const logoutHandler = () => {
     localStorage.removeItem("userInfo");
     window.location.reload();
   };
-  const { colorMode } = useColorMode();
-
   const bg = useColorModeValue(
-    "linear(to-b,#C39A9E,#808293)",
+    "radial-gradient(circle, rgba(238,174,202,1) 0%, rgba(148,187,233,1) 100%)",
     "linear(to-t,blue.900,purple.900)"
   );
   const divAnimationControls = useAnimation();
   const divAnimationControlsImage = useAnimation();
+  const { colorMode, toggleColorMode } = useColorMode();
 
   const divAnimationVariants = {
     init: {
-      width: "50px",
+      width: "40px",
     },
     anim: {
       width: "150px",
@@ -55,7 +60,7 @@ export default function NavigationSideBar() {
       },
     },
     exit: {
-      width: "50px",
+      width: "40px",
       transition: {
         type: "circIn",
         duration: 0.25,
@@ -73,20 +78,11 @@ export default function NavigationSideBar() {
       width: "120px",
       height: "120px",
       paddingTop: 5,
-      transition: {
-        type: "circOut",
-        duration: 0.25,
-      },
     },
     exit: {
       width: "25px",
       height: "25px",
       paddingTop: 0,
-
-      transition: {
-        type: "circIn",
-        duration: 0.25,
-      },
     },
   };
   return (
@@ -97,6 +93,11 @@ export default function NavigationSideBar() {
         paddingTop: 8,
         justifyContent: "center",
         width: "40px",
+      }}
+      transition={{
+        type: "spring",
+        stiffness: 700,
+        damping: 20,
       }}
       initial={divAnimationVariants.init}
       animate={divAnimationControls}
@@ -122,7 +123,7 @@ export default function NavigationSideBar() {
       >
         <Avatar
           size={"full"}
-          maxBlockSize={"28"}
+          maxBlockSize={"32"}
           name={user.fullname}
           transition="all 0.25 ease-in-out"
           src={user.pic}
@@ -132,7 +133,87 @@ export default function NavigationSideBar() {
           @{isHover && user.username}
         </Text>
       </motion.div>
+
+      <HStack mx={isHover ? 5 : 1} my="8">
+        <Box
+          className={`${
+            isOn ? "justify-end" : "justify-start"
+          } w-[50px] h-[30px] bg-slate-400 flex rounded-full p-1 cursor-pointer 
+                    `}
+          onClick={() => {
+            toggleSwitch();
+            toggleColorMode();
+          }}
+        >
+          <motion.div
+            className={`handle w-[25px] h-[20px] flex justify-center items-center  ${
+              isHover && "rounded-full"
+            }`}
+            layout
+            transition={{
+              type: "spring",
+              stiffness: 700,
+              damping: 20,
+            }}
+            onClick={toggleColorMode}
+          >
+            <IconButton
+              variant={"ghost"}
+              className="transition-opacity"
+              borderRadius="full"
+              transform="unset"
+              _hover={{
+                transform: "rotate(40deg)",
+              }}
+              color="black"
+              bgGradient={
+                colorMode === "light"
+                  ? "radial-gradient(circle, rgba(238,174,202,1) 0%, rgba(148,187,233,1) 100%)"
+                  : "linear(to-b,#1E2B6F,#193F5F)"
+              }
+              icon={
+                colorMode === "light" ? (
+                  <MoonIcon textColor={"whiteAlpha.900"} />
+                ) : (
+                  <SunIcon textColor={"yellow"} />
+                )
+              }
+            />
+          </motion.div>
+        </Box>
+        <Text fontWeight={"bold"}>
+          {colorMode === "light" ? "Light" : "Dark"}
+        </Text>
+      </HStack>
       <Spacer />
+
+      <DrawerSearchUser>
+        <Button
+          className="pullRight"
+          _hover={{
+            textColor:
+              colorMode === "dark" ? "whiteAlpha.900" : "grayAlpha.500",
+            rounded: "none",
+          }}
+          leftIcon={
+            <SearchIcon
+              w={5}
+              h={5}
+              transition={"transform 0.6s"}
+              transform={isHover && "rotateY(180deg)"}
+            />
+          }
+          _active={{ rounded: "none" }}
+          variant={"ghost"}
+          rounded="none"
+          w="100%"
+        >
+          <Text noOfLines={1} w="full" textAlign={"left"}>
+            Search
+          </Text>
+        </Button>
+      </DrawerSearchUser>
+
       <Button
         className="pullRight"
         _hover={{
@@ -140,7 +221,9 @@ export default function NavigationSideBar() {
           rounded: "none",
         }}
         _active={{ rounded: "none" }}
+        bgGradient={display && bg}
         variant={"ghost"}
+        rounded="none"
         leftIcon={
           <Icon
             as={MdOutlineFeaturedPlayList}
@@ -150,6 +233,7 @@ export default function NavigationSideBar() {
             transform={isHover && "rotateY(180deg)"}
           />
         }
+        onClick={() => setIsDisplay(true)}
         w="full"
       >
         <Text noOfLines={1} w="full" textAlign={"left"}>
@@ -158,6 +242,7 @@ export default function NavigationSideBar() {
       </Button>
       <Button
         _active={{ rounded: "none" }}
+        rounded="none"
         className="pullRight"
         _hover={{
           textColor: colorMode === "dark" ? "whiteAlpha.900" : "grayAlpha.500",
@@ -170,6 +255,8 @@ export default function NavigationSideBar() {
             transform={isHover && "rotateY(180deg)"}
           />
         }
+        bgGradient={!display && bg}
+        onClick={() => setIsDisplay(false)}
         w="full"
       >
         <Text noOfLines={1} w="full" textAlign={"left"}>
@@ -210,9 +297,13 @@ export default function NavigationSideBar() {
             </MenuItem>
           </ProfileModal>
           <MenuDivider />
-          <MenuItem icon={<ArrowForwardIcon />} onClick={() => logoutHandler()}>
+          <MenuItem
+            icon={<ArrowForwardIcon />}
+            _hover={{ color: "red.500" }}
+            onClick={() => logoutHandler()}
+          >
             <Text textAlign={"left"} w="full">
-              Log out
+              Logout
             </Text>
           </MenuItem>
         </MenuList>

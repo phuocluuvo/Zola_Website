@@ -1,6 +1,8 @@
 import {
   Box,
   Button,
+  Divider,
+  HStack,
   Input,
   ScaleFade,
   Text,
@@ -226,56 +228,63 @@ function SignIn({ setShow, isOpen }) {
           padding="3"
           textColor={"gray.500"}
         />
+
+        <Text
+          transitionDuration={"150ms"}
+          textAlign="right"
+          textColor={"whiteAlpha.900"}
+          _hover={{
+            bgClip: "text",
+            bgGradient: "linear(to-br,blue.300, pink.400)",
+          }}
+        >
+          forgot password, eh? Press here, bro.
+        </Text>
+        <Box zIndex={10}>
+          <Button
+            variant={"link"}
+            colorScheme={"yellow"}
+            fontWeight={"bold"}
+            transition="all 0.25s ease-in-out"
+            fontSize={32}
+            _hover={{
+              bgClip: "text",
+              bgGradient: "linear(to-br,red.600,yellow.600)",
+            }}
+            onClick={submitHandler}
+            isLoading={loading}
+            isDisabled={!password || !email}
+          >
+            Sign In
+          </Button>
+        </Box>
+        <HStack w="full" my="3">
+          <Divider />
+          <Text bg="whiteAlpha.300" rounded="full" px="2" color="white">
+            or
+          </Text>
+          <Divider />
+        </HStack>
+        <Box zIndex={10}>
+          <GoogleButton
+            variant={"link"}
+            colorScheme={"yellow"}
+            fontWeight={"bold"}
+            transition="ease-in-out"
+            transitionDuration={150}
+            fontSize={32}
+            _hover={{
+              bgClip: "text",
+              bgGradient: "linear(to-br,red.600,yellow.600)",
+            }}
+            mb="5"
+            onClick={signInWithGoogle}
+            isLoading={loading}
+          >
+            Sign In GG
+          </GoogleButton>
+        </Box>
       </VStack>
-      <Text
-        transitionDuration={"150ms"}
-        textAlign="right"
-        textColor={"whiteAlpha.900"}
-        _hover={{
-          bgClip: "text",
-          bgGradient: "linear(to-br,blue.300, pink.400)",
-        }}
-      >
-        forgot password, eh? Press here, bro.
-      </Text>
-      <Box zIndex={10}>
-        <Button
-          variant={"link"}
-          colorScheme={"yellow"}
-          fontWeight={"bold"}
-          transition="all 0.25s ease-in-out"
-          fontSize={32}
-          _hover={{
-            bgClip: "text",
-            bgGradient: "linear(to-br,red.600,yellow.600)",
-          }}
-          mb="5"
-          onClick={submitHandler}
-          isLoading={loading}
-          isDisabled={!password || !email}
-        >
-          Sign In
-        </Button>
-      </Box>
-      <Box zIndex={10}>
-        <GoogleButton
-          variant={"link"}
-          colorScheme={"yellow"}
-          fontWeight={"bold"}
-          transition="ease-in-out"
-          transitionDuration={150}
-          fontSize={32}
-          _hover={{
-            bgClip: "text",
-            bgGradient: "linear(to-br,red.600,yellow.600)",
-          }}
-          mb="5"
-          onClick={signInWithGoogle}
-          isLoading={loading}
-        >
-          Sign In GG
-        </GoogleButton>
-      </Box>
     </ScaleFade>
   );
 }

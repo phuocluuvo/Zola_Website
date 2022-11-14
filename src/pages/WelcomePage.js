@@ -42,21 +42,16 @@ function WelcomePage() {
       <Box
         id="login_form"
         position="relative"
-        w={{ lg: "33,3%", base: "fit-content" }}
-        pt={{ lg: "10", base: "auto" }}
-        p={{ lg: "10", base: "10" }}
-        ml={{ lg: "28" }}
-        flex={{ lg: "flex" }}
-        flexDir={{ lg: "column" }}
-        justifyContent={{ lg: "justify-end" }}
+        w={{ base: "full", md: "fit-content" }}
+        h={{ base: "full", md: "fit-content" }}
         shadow="2xl"
-        borderRadius={"xl"}
-        mt={"10"}
+        m="0"
+        borderRadius={{ base: "none", md: "xl" }}
+        top={{ base: "0", md: "50%" }}
+        left={{ base: "0", md: "50%" }}
+        transform={{ base: "unset", md: "translate(-50%, -50%)" }}
         zIndex={10}
-        className="
-        card
-        card--8
-        "
+        className="card card--8"
         onMouseLeave={(e) => {
           document.documentElement.style.setProperty("--mouseX8", 0);
           document.documentElement.style.setProperty("--mouseY8", 0);
@@ -104,7 +99,7 @@ function WelcomePage() {
             className="parallax"
             data-value="3"
           >
-            ứng dụng mạng xã hội hot nhất hiện nay
+            "Zo" a room then "la" together
           </Text>
         </Box>
         {!show ? (
@@ -113,7 +108,7 @@ function WelcomePage() {
           <SignUp setShow={setShow} isOpen={!isOpen} />
         )}
         {!show ? (
-          <Text textColor={"whiteAlpha.900"}>
+          <Text textColor={"whiteAlpha.900"} align="center">
             don't have an account?{" "}
             <span className="font-bold">
               <Button
@@ -133,7 +128,7 @@ function WelcomePage() {
             </span>
           </Text>
         ) : (
-          <Text textColor={"whiteAlpha.900"}>
+          <Text textColor={"whiteAlpha.900"} align="center">
             already have an account?{" "}
             <span className="font-bold">
               <Button
@@ -157,7 +152,20 @@ function WelcomePage() {
       <Box id="picture_login"></Box>
       <Box id="square1"></Box>
       <Box id="square2"></Box>
-
+      <div class="area">
+        <ul class="circles parallax" data-value="5">
+          <li></li>
+          <li></li>
+          <li></li>
+          <li></li>
+          <li></li>
+          <li></li>
+          <li></li>
+          <li></li>
+          <li></li>
+          <li></li>
+        </ul>
+      </div>
       <motion.div
         initial={{ scaleX: 1 }}
         animate={{ scaleX: 0, transition: { duration: 0.5, ease: "circOut" } }}
