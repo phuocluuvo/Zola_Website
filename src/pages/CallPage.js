@@ -17,7 +17,6 @@ export default function CallPage() {
   const [stateVideo, setstateVideo] = useState(true);
   const [stateSound, setstateSound] = useState(true);
   const [localStream, setlocalStream] = useState();
-  const [mute, setMute] = useState(false);
   async function getInfo() {
     await axios
       .get(`https://zolachatapp.herokuapp.com/api/user/${user}/id`)
@@ -140,7 +139,7 @@ export default function CallPage() {
         className=" rounded-full flex flex-row items-center justify-evenly relative bg-slate-400 bg-opacity-50 
         backdrop-blur-lg border-white border left-5 px-4 py-2"
       >
-        <Tooltip label={!stateSound ? "Turn on Camera" : "Turn off Camera"}>
+        <Tooltip label={!stateSound ? "Unmute" : "Mute"}>
           <IconButton
             rounded={"full"}
             bgColor={!stateSound ? "red.500" : "gray.500"}
@@ -152,7 +151,7 @@ export default function CallPage() {
             onClick={sound}
           ></IconButton>
         </Tooltip>
-        <Tooltip label={!stateVideo ? "Unmute" : "Mute"}>
+        <Tooltip label={!stateVideo ? "Turn on Camera" : "Turn off Camera"}>
           <IconButton
             rounded={"full"}
             bgColor={!stateVideo ? "red.500" : "gray.500"}
