@@ -38,44 +38,45 @@ function WelcomePage() {
   //Animation
   console.log("WelcomePage is rendered");
   return (
-    <div className="overflow-hidden relative max-w-full transition-transform bg-gradient-to-b from-dark-blue to-deep-blue h-[100vh]">
+    <div
+      onMouseLeave={(e) => {
+        document.documentElement.style.setProperty("--mouseX8", 0);
+        document.documentElement.style.setProperty("--mouseY8", 0);
+      }}
+      onMouseMove={(e) => {
+        let wh = window.innerHeight / 3,
+          ww = window.innerWidth / 3;
+        document.documentElement.style.setProperty(
+          "--mouseX8",
+          (e.clientX - ww) / 50
+        );
+        document.documentElement.style.setProperty(
+          "--mouseY8",
+          (e.clientY - wh) / 50
+        );
+        document.querySelectorAll(".parallax").forEach((move) => {
+          let moving_vl = move.getAttribute("data-value");
+          let x = (e.clientX * moving_vl) / 100;
+          let y = (e.clientY * moving_vl) / 100;
+
+          move.style.transform =
+            "translateX(" + x + "px) translateY(" + y + "px)";
+        });
+      }}
+      className="overflow-hidden relative max-w-full transition-transform bg-gradient-to-b from-dark-blue to-deep-blue h-[100vh]"
+    >
       <Box
         id="login_form"
         position="relative"
         w={{ base: "full", md: "fit-content" }}
         h={{ base: "full", md: "fit-content" }}
-        shadow="2xl"
         m="0"
         borderRadius={{ base: "none", md: "xl" }}
         top={{ base: "0", md: "50%" }}
         left={{ base: "0", md: "50%" }}
         transform={{ base: "unset", md: "translate(-50%, -50%)" }}
         zIndex={10}
-        className="card card--8"
-        onMouseLeave={(e) => {
-          document.documentElement.style.setProperty("--mouseX8", 0);
-          document.documentElement.style.setProperty("--mouseY8", 0);
-        }}
-        onMouseMove={(e) => {
-          let wh = window.innerHeight / 3,
-            ww = window.innerWidth / 3;
-          document.documentElement.style.setProperty(
-            "--mouseX8",
-            (e.clientX - ww) / 50
-          );
-          document.documentElement.style.setProperty(
-            "--mouseY8",
-            (e.clientY - wh) / 50
-          );
-          document.querySelectorAll(".parallax").forEach((move) => {
-            let moving_vl = move.getAttribute("data-value");
-            let x = (e.clientX * moving_vl) / 120;
-            let y = (e.clientY * moving_vl) / 120;
-
-            move.style.transform =
-              "translateX(" + x + "px) translateY(" + y + "px)";
-          });
-        }}
+        className="card card--8 transition-transform"
       >
         <Box m={0} zIndex={10}>
           <Text

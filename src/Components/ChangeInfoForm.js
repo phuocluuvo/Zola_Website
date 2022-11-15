@@ -1,20 +1,20 @@
 import {
+  Avatar,
+  Box,
   Button,
   FormControl,
   FormErrorMessage,
-  FormHelperText,
-  FormLabel,
-  HStack,
-  Image,
   Input,
   InputGroup,
   InputLeftElement,
+  Spacer,
   Tab,
   TabList,
   TabPanel,
   TabPanels,
   Tabs,
   Text,
+  Tooltip,
   useToast,
   VStack,
 } from "@chakra-ui/react";
@@ -23,6 +23,7 @@ import { Field, Form, Formik } from "formik";
 import { ChatState } from "../providers/ChatProvider";
 import axios from "axios";
 
+import { AiFillEdit } from "react-icons/ai";
 function ChangeInfoForm({ userUpdate }) {
   const toast = useToast();
 
@@ -142,35 +143,85 @@ function ChangeInfoForm({ userUpdate }) {
             <Tab>Change Password</Tab>
           </TabList>
           <TabPanels>
-            <TabPanel>
-              <Formik
-                initialValues={{
-                  _id: user._id,
-                  fullname: user.fullname,
-                  username: user.username,
-                  pic: user.pic,
-                }}
-                onSubmit={(values, actions) => {
-                  handleSubmitChangeInfo(values);
-                  actions.setSubmitting(false);
-                }}
-              >
-                {(props) => (
-                  <Form>
-                    <Field name="username" validate={validateUserName}>
+            <Formik
+              initialValues={{
+                _id: user._id,
+                fullname: user.fullname,
+                username: user.username,
+                pic: user.pic,
+              }}
+              onSubmit={(values, actions) => {
+                handleSubmitChangeInfo(values);
+                actions.setSubmitting(false);
+              }}
+            >
+              {(props) => (
+                <Form className="flex">
+                  <Box w="full" flex={0.3}>
+                    <Field name="pic">
+                      {({ field, form }) => (
+                        <FormControl className="justify-center flex flex-col items-center w-full">
+                          <Input
+                            id="newAvatar"
+                            type="file"
+                            hidden
+                            accept="image/*"
+                            p="1.5"
+                            onChange={(e) => postDetails(e.target.files[0])}
+                          />
+
+                          <label htmlFor="newAvatar">
+                            <Tooltip label="Change Avatar">
+                              <Box pos="relative" cursor={"pointer"}>
+                                <Avatar
+                                  name={user.fullname}
+                                  src={pic}
+                                  size="xl"
+                                />
+                                <Box
+                                  _hover={{
+                                    border: "2px solid white",
+                                    rounded: "full",
+                                    bgColor: "whiteAlpha.500",
+                                    opacity: "1",
+                                  }}
+                                  opacity="0"
+                                  w="full"
+                                  h="full"
+                                  className="absolute z-10 top-[50%] left-[50%] -translate-x-1/2 -translate-y-1/2 transition-all"
+                                >
+                                  <AiFillEdit
+                                    fontSize={"40"}
+                                    color="white"
+                                    className="absolute z-10 top-[50%] left-[50%] -translate-x-1/2 -translate-y-1/2 "
+                                  />
+                                </Box>
+                              </Box>
+                            </Tooltip>
+                          </label>
+                        </FormControl>
+                      )}
+                    </Field>
+                  </Box>
+                  <VStack w="full" flex={0.7} className="mx-2">
+                    <Field
+                      name="username"
+                      validate={validateUserName}
+                      className="w-full"
+                    >
                       {({ field, form }) => (
                         <FormControl
                           isInvalid={
                             form.errors.username && form.touched.username
                           }
                         >
-                          <FormLabel>Username</FormLabel>
                           <InputGroup>
                             <InputLeftElement>
-                              <Text>@</Text>
+                              <Text fontWeight={"bold"}>@</Text>
                             </InputLeftElement>
                             <Input
                               {...field}
+                              isInvalid={form.errors.username === null}
                               rounded={"lg"}
                               placeholder={"Enter your user name"}
                             />
@@ -181,16 +232,20 @@ function ChangeInfoForm({ userUpdate }) {
                         </FormControl>
                       )}
                     </Field>
-                    <Field name="fullname" validate={validateFullName}>
+                    <Field
+                      name="fullname"
+                      validate={validateFullName}
+                      className="w-full"
+                    >
                       {({ field, form }) => (
                         <FormControl>
-                          <FormLabel>Full Name</FormLabel>
                           <InputGroup>
                             <InputLeftElement>
-                              <Text>n</Text>
+                              <Text fontWeight={"bold"}>n</Text>
                             </InputLeftElement>
                             <Input
                               {...field}
+                              isInvalid={form.errors.fullname === null}
                               rounded={"lg"}
                               placeholder={"Enter your new full name"}
                             />
@@ -201,41 +256,20 @@ function ChangeInfoForm({ userUpdate }) {
                         </FormControl>
                       )}
                     </Field>
-                    <Field name="pic">
-                      {({ field, form }) => (
-                        <FormControl>
-                          <FormLabel>Avatar</FormLabel>
-                          <HStack>
-                            <Image
-                              boxSize="100px"
-                              objectFit="cover"
-                              src={pic}
-                              rounded="full"
-                              alt="user avatar"
-                            />
-                            <Input
-                              type="file"
-                              accept="image/*"
-                              p="1.5"
-                              onChange={(e) => postDetails(e.target.files[0])}
-                            />
-                          </HStack>
-                          <FormHelperText>Image only</FormHelperText>
-                        </FormControl>
-                      )}
-                    </Field>
-                    <Button
-                      mt={4}
-                      colorScheme="teal"
-                      isLoading={props.isSubmitting}
-                      type="submit"
-                    >
-                      Apply
-                    </Button>
-                  </Form>
-                )}
-              </Formik>
-            </TabPanel>
+                    <Box display="flex" w="full">
+                      <Spacer />
+                      <Button
+                        colorScheme="teal"
+                        isLoading={props.isSubmitting}
+                        type="submit"
+                      >
+                        Apply
+                      </Button>
+                    </Box>
+                  </VStack>
+                </Form>
+              )}
+            </Formik>
             <TabPanel>
               <VStack>
                 <Input

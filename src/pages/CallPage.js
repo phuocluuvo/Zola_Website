@@ -39,7 +39,6 @@ export default function CallPage() {
           var ac = window.confirm("Co Nhan Cuoc Goi");
           if (ac) {
             const call = peer.call(id, stream);
-
             call.on("stream", (remoteStream) => playStream("en", remoteStream));
           }
         } else {
