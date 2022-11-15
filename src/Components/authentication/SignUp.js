@@ -19,6 +19,7 @@ import {
   InputRightElement,
   HStack,
   Avatar,
+  Tooltip,
 } from "@chakra-ui/react";
 
 import axios from "axios";
@@ -27,8 +28,8 @@ import React, { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AtSignIcon, EmailIcon } from "@chakra-ui/icons";
 import { HiCheck } from "react-icons/hi";
-import { FcCancel } from "react-icons/fc";
 import { MdPassword } from "react-icons/md";
+import { RiErrorWarningLine } from "react-icons/ri";
 function SignUp({ setShow }) {
   const [fullname, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -111,42 +112,45 @@ function SignUp({ setShow }) {
       return;
     }
     inputRef.current.value = null;
-    try {
-      const config = {
-        headers: {
-          "Content-type": "application/json",
-        },
-      };
+    if (checkEmail(email) || checkPassword(password) || checkUserName(username))
+      return;
+    else
+      try {
+        const config = {
+          headers: {
+            "Content-type": "application/json",
+          },
+        };
 
-      const { data } = await axios.post(
-        "https://zolachatapp.herokuapp.com/api/user",
-        { username, fullname, email, password, pic },
-        config
-      );
-      if (data.verify === false) {
+        const { data } = await axios.post(
+          "https://zolachatapp.herokuapp.com/api/user",
+          { username, fullname, email, password, pic },
+          config
+        );
+        if (data.verify === false) {
+          toast({
+            title: "Account not verify. Please account verification",
+            status: "success",
+            duration: 2500,
+            isClosable: true,
+            position: "bottom",
+          });
+        }
+
+        if (data.verify === true) {
+          localStorage.setItem("userInfo", JSON.stringify(data));
+          setLoading(false);
+          navigate("/chats");
+        }
+      } catch (error) {
         toast({
-          title: "Account not verify. Please account verification",
-          status: "success",
+          title: "Sign up failed " + error,
+          status: "error",
           duration: 2500,
           isClosable: true,
           position: "bottom",
         });
       }
-
-      if (data.verify === true) {
-        localStorage.setItem("userInfo", JSON.stringify(data));
-        setLoading(false);
-        navigate("/chats");
-      }
-    } catch (error) {
-      toast({
-        title: "Sign up failed " + error,
-        status: "error",
-        duration: 2500,
-        isClosable: true,
-        position: "bottom",
-      });
-    }
   };
 
   const submitOTP = async () => {
@@ -198,38 +202,33 @@ function SignUp({ setShow }) {
       setEmailExist(true);
       return;
     }
-    if (
-      /^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(
-        query
-      )
-    )
-      try {
-        const config = {
-          headers: {
-            "Content-type": "application/json",
-          },
-          cancelToken: source.token,
-        };
-        await axios
-          .post(
-            "https://zolachatapp.herokuapp.com/api/user/checkemail/:email",
-            { email: query },
-            config
-          )
-          .then((data) => {
-            if (data.data.email) setEmailExist(true);
-            else setEmailExist(false);
-          });
-      } catch (error) {
-        if (axios.isCancel(error)) console.log("successfully aborted");
-      }
-    else setEmailExist(true);
+
+    try {
+      const config = {
+        headers: {
+          "Content-type": "application/json",
+        },
+        cancelToken: source.token,
+      };
+      await axios
+        .post(
+          "https://zolachatapp.herokuapp.com/api/user/checkemail/:email",
+          { email: query },
+          config
+        )
+        .then((data) => {
+          if (data.data.email) setEmailExist(true);
+          else setEmailExist(false);
+        });
+    } catch (error) {
+      if (axios.isCancel(error)) console.log("successfully aborted");
+    }
+
     return () => {
       source.cancel();
     };
   }
   const [usernameExist, setUsernameExist] = useState(true);
-
   async function handlerSearchUsername(query) {
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();
@@ -270,6 +269,43 @@ function SignUp({ setShow }) {
     return () => {
       source.cancel();
     };
+  }
+  function checkUserName(value) {
+    if (!value) {
+      return "Username must be filled";
+    } else if (
+      !/^(?=[a-zA-Z0-9._]{5,20}$)(?!.*[_.]{2})[^_.].*[^_.]$/.test(value)
+    ) {
+      return "Username is contain 5-20 characters and not include special characters";
+    } else if (usernameExist) return "Username was taken";
+    else return;
+  }
+  function checkEmail(value) {
+    if (!value) return "Email must be filled";
+
+    if (
+      !/^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(
+        value
+      )
+    )
+      return "Email must be valid";
+    if (emailExist) {
+      return "Email was taken";
+    } else return;
+  }
+  function checkPassword(value) {
+    let error;
+    if (!value) {
+      error = "Passwords must be filled";
+    } else if (
+      !/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/.test(
+        value
+      )
+    ) {
+      error =
+        "Passwords is more than 8 characters, 1 special characters, 1 uppercase and 1 lowercase letter";
+    }
+    return error;
   }
 
   return (
@@ -316,16 +352,17 @@ function SignUp({ setShow }) {
                   textColor={username ? "blackAlpha.800" : "gray.500"}
                 />{" "}
                 <InputRightElement>
-                  {usernameExist || !username ? (
-                    <FcCancel color="red" />
+                  {checkUserName(username) ? (
+                    <Tooltip label={checkUserName(username)}>
+                      <Text>
+                        <RiErrorWarningLine color="red" />
+                      </Text>
+                    </Tooltip>
                   ) : (
                     <HiCheck color="green" />
                   )}
                 </InputRightElement>
               </InputGroup>
-              {(usernameExist || !username) && (
-                <Text color={"red.500"}>username not availible</Text>
-              )}
             </Box>
             <InputGroup size="md" mb={0} h={45}>
               <InputLeftElement
@@ -338,12 +375,25 @@ function SignUp({ setShow }) {
               <Input
                 type={"name"}
                 value={fullname}
+                isInvalid={!fullname}
+                errorBorderColor="crimson"
                 placeholder="Enter your full name"
                 onChange={(e) => setName(e.target.value)}
                 bgColor={"whiteAlpha.900"}
                 borderRadius="lg"
                 textColor={fullname ? "blackAlpha.800" : "gray.500"}
               />
+              <InputRightElement>
+                {!fullname ? (
+                  <Tooltip label={"Full name must be filled"}>
+                    <Text>
+                      <RiErrorWarningLine color="red" />
+                    </Text>
+                  </Tooltip>
+                ) : (
+                  <HiCheck color="green" />
+                )}
+              </InputRightElement>
             </InputGroup>
           </HStack>
           <Box>
@@ -370,17 +420,19 @@ function SignUp({ setShow }) {
                 textColor={email ? "blackAlpha.800" : "gray.500"}
               />{" "}
               <InputRightElement>
-                {emailExist ? (
-                  <FcCancel color="red" />
+                {checkEmail(email) ? (
+                  <Tooltip label={checkEmail(email)}>
+                    <Text>
+                      <RiErrorWarningLine color="red" />
+                    </Text>
+                  </Tooltip>
                 ) : (
                   <HiCheck color="green" />
                 )}
               </InputRightElement>
             </InputGroup>
-            {(emailExist || !email) && (
-              <Text color={"red.500"}>email not availible</Text>
-            )}
           </Box>
+
           <VStack>
             <InputGroup size="md" mb={0} h={45}>
               <InputLeftElement
@@ -403,14 +455,23 @@ function SignUp({ setShow }) {
                 textColor={password ? "blackAlpha.800" : "gray.500"}
               />
               <InputRightElement>
-                {password !== confirmpassword || !password ? (
-                  <FcCancel color="red" />
+                {checkPassword(password) ? (
+                  <Tooltip
+                    label={checkPassword(password)}
+                    placement="top"
+                    hasArrow
+                  >
+                    <Text>
+                      <RiErrorWarningLine color="red" />
+                    </Text>
+                  </Tooltip>
                 ) : (
                   <HiCheck color="green" />
                 )}
               </InputRightElement>
             </InputGroup>
           </VStack>
+
           <Box>
             <InputGroup size="md" mb={0} h={45}>
               <InputLeftElement
@@ -435,18 +496,18 @@ function SignUp({ setShow }) {
               />
               <InputRightElement>
                 {password !== confirmpassword || !password ? (
-                  <FcCancel color="red" />
+                  <Tooltip
+                    label={"Password and Password confirm must be the same"}
+                  >
+                    <Text>
+                      <RiErrorWarningLine color="red" />
+                    </Text>
+                  </Tooltip>
                 ) : (
                   <HiCheck color="green" />
                 )}
               </InputRightElement>
             </InputGroup>
-            {password !== confirmpassword ||
-              ((!password || !confirmpassword) && (
-                <Text color={"red.500"}>
-                  Password and Password to confirm must be the same
-                </Text>
-              ))}
           </Box>
         </VStack>{" "}
       </HStack>
