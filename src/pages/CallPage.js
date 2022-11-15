@@ -27,6 +27,7 @@ export default function CallPage() {
   }
   useEffect(() => {
     getInfo();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {

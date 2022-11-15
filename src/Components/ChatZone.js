@@ -550,7 +550,7 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                     <IconButton
                       onClick={() => {
                         window.open(
-                          "https://zolachatapp.herokuapp.com/call/null/" +
+                          "https://zolachatapp.netlify.app/call/null/" +
                             getSenderInfo(user, selectedChat.users)._id,
                           "Call",
                           "toolbar=yes,scrollbars=yes,resizable=yes,top=50,left=70,width=1200,height=600"
