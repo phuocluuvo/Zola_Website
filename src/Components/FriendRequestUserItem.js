@@ -22,8 +22,8 @@ function FriendRequestUserItem({ ufr, user }) {
       };
       await axios
         .post(
-          `https://zolachatapp.herokuapp.com/api/friendRequest/deleteSended/${ufr._id}`,
-          { friendRequestId: ufr._id },
+          `https://zolachatapp.herokuapp.com/api/friendRequest/deleteSended/${ufr.user[0]._id}`,
+          { friendRequestId: ufr.user[0]._id },
           config
         )
         .then((data) => {

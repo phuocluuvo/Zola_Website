@@ -109,16 +109,38 @@ function ChangeInfoForm({ userUpdate }) {
     }
   };
   const handleSubmitChangePassword = async (values) => {};
-  function validateUserName(value) {
+  async function validateUserName(value) {
+    const CancelToken = axios.CancelToken;
+    const source = CancelToken.source();
     let error;
     if (!value) {
       error = "Username must be filled";
     } else if (
-      !/^(?=[a-zA-Z0-9._]{5,20}$)(?!.*[_.]{2})[^_.].*[^_.]$/.test(value)
-    ) {
+      /^[a-zA-Z0-9]([._-](?![._-])|[a-zA-Z0-9]){3,18}[a-zA-Z0-9]$/.test(value)
+    )
+      try {
+        const config = {
+          headers: {
+            "Content-type": "application/json",
+          },
+          cancelToken: source.token,
+        };
+        await axios
+          .post(
+            "https://zolachatapp.herokuapp.com/api/user/checkusername/:username",
+            { username: value },
+            config
+          )
+          .then((data) => {
+            console.log(data.data.username);
+            if (data.data.username) error = "Username already exist";
+          });
+      } catch (error) {
+        if (axios.isCancel(error)) console.log("successfully aborted");
+      }
+    else
       error =
-        "Username is contain 5-20 characters and not include special characters";
-    }
+        "Username is contain 5-18 characters and not include special characters";
     return error;
   }
   function validateFullName(value) {

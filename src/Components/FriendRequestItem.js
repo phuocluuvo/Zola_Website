@@ -30,8 +30,8 @@ function FriendRequestItem({ friendRequest, user }) {
       };
       await axios
         .post(
-          `https://zolachatapp.herokuapp.com/api/friendRequest/accept/${friendRequest._id}`,
-          { friendRequestId: friendRequest._id },
+          `https://zolachatapp.herokuapp.com/api/friendRequest/accept/${friendRequest.user[0]._id}`,
+          { friendRequestId: friendRequest.user[0]._id },
           config
         )
         .then((data) => {
@@ -65,8 +65,8 @@ function FriendRequestItem({ friendRequest, user }) {
       };
       await axios
         .post(
-          `https://zolachatapp.herokuapp.com/api/friendRequest/denied/${friendRequest._id}`,
-          { friendRequestId: friendRequest._id },
+          `https://zolachatapp.herokuapp.com/api/friendRequest/denied/${friendRequest.user[0]._id}`,
+          { friendRequestId: friendRequest.user[0]._id },
           config
         )
         .then((data) => {
@@ -97,7 +97,7 @@ function FriendRequestItem({ friendRequest, user }) {
     >
       <Box w="full">
         <Box display={"flex"} justifyContent="space-between">
-          <Avatar src={friendRequest?.pic} size="lg" />
+          <Avatar src={friendRequest?.user[0].pic} size="lg" />
           <Text
             fontSize="10"
             textAlign={"right"}
@@ -107,8 +107,8 @@ function FriendRequestItem({ friendRequest, user }) {
             {moment(friendRequest?.createdAt).fromNow()}
           </Text>
         </Box>
-        <Text fontSize={"xs"}>@{friendRequest?.username}</Text>
-        <Text noOfLines={1}>{friendRequest?.fullname}</Text>
+        <Text fontSize={"xs"}>@{friendRequest?.user[0].username}</Text>
+        <Text noOfLines={1}>{friendRequest?.user[0].fullname}</Text>
       </Box>
       <HStack spacing={2} mt="5">
         <Button
@@ -121,7 +121,7 @@ function FriendRequestItem({ friendRequest, user }) {
         </Button>
 
         <Button
-          variant={isDeniedSuccess ? "solid" : "ghost"}
+          variant={isDeniedSuccess ? "solid" : "outline"}
           colorScheme={"red"}
           textColor="red"
           onClick={denyFriendRequest}

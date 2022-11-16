@@ -276,8 +276,8 @@ function FriendsZone({ display, user, setIsDisplay }) {
                 )}
               </Box>
             </TabPanel>
-            <TabPanel h="full">
-              <Box w="full">
+            <TabPanel>
+              <Box w="full" h="100vh">
                 {isLoadingUserRequestedList ? (
                   <Box w="full">
                     <Spinner size={"lg"} mx="auto" />
@@ -325,7 +325,7 @@ function FriendsZone({ display, user, setIsDisplay }) {
                 }}
                 gap={6}
               >
-                {friends.length > 0 ? (
+                {friends.length > 0 &&
                   friends.map((user) => (
                     <GridItem
                       key={user._id}
@@ -343,16 +343,16 @@ function FriendsZone({ display, user, setIsDisplay }) {
                         handleFunction={() => accessChat(user._id)}
                       />
                     </GridItem>
-                  ))
-                ) : (
-                  <VStack opacity="0.5">
-                    <RiEmotionSadFill fontSize={"100"} />
-                    <Text textAlign={"center"}>
-                      You seems so lonely, find some friend to add to the list
-                    </Text>
-                  </VStack>
-                )}
+                  ))}
               </Grid>
+              {friends.length <= 0 && (
+                <VStack opacity="0.5" m="auto">
+                  <RiEmotionSadFill fontSize={"100"} />
+                  <Text textAlign={"center"}>
+                    You seems so lonely, find some friend to add to the list
+                  </Text>
+                </VStack>
+              )}
             </TabPanel>
           </TabPanels>
         </Tabs>
