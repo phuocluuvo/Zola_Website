@@ -244,7 +244,9 @@ function ChatList({ fetchAgain, setFetchAgain }) {
                   w={{ base: "fit-content", md: "100px" }}
                   p={{ base: "5", md: "1" }}
                 >
-                  {moment(chat.latestMessage?.createdAt).fromNow()}
+                  {chat.latestMessage?.content === undefined
+                    ? ""
+                    : moment(chat.latestMessage?.createdAt).fromNow()}
                 </Text>
                 {/*menu button*/}
                 <Box>
