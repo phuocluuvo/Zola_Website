@@ -209,7 +209,7 @@ function SideBarClosed({ fetchAgain }) {
                 className="transition-opacity pullRight"
                 onClick={() => {
                   selectedChat
-                    ? io("https://zolachatapp.herokuapp.com").emit(
+                    ? io("https://zolachatapp-sever.onrender.com").emit(
                         "outchat",
                         selectedChat._id
                       )

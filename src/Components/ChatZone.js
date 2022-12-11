@@ -44,7 +44,7 @@ import UploadMenuButton from "./UploadMenuButton";
 import AddFriendButton from "./AddFriendButton";
 import { HiVideoCamera } from "react-icons/hi";
 
-const ENDPOINT = "https://zolachatapp.herokuapp.com";
+const ENDPOINT = "https://zolachatapp-sever.onrender.com";
 
 let socket, selectedChatCompare;
 function ChatZone({ fetchAgain, setFetchAgain }) {

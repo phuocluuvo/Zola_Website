@@ -4,7 +4,7 @@ import axios from "axios";
 import gsap from "gsap";
 import { useIsPresent } from "framer-motion";
 import { useParams, useNavigate } from "react-router-dom";
-const link = "https://zolachatapp.herokuapp.com";
+const link = "https://zolachatapp-sever.onrender.com";
 function ForgotPage({ setShow }) {
   const [password, setPassword] = useState("");
   const [confirmpassword, setConfirmPassword] = useState("");
