@@ -43,7 +43,7 @@ function AddFriendButton({ user, selectedChat, friend }) {
         cancelToken: source.token,
       };
       const { data } = await axios.get(
-        `https://zolachatapp.herokuapp.com/api/friends`,
+        `https://zolachatapp-sever.onrender.com/api/friends`,
         config
       );
       if (user) setFriends(data);
@@ -81,7 +81,7 @@ function AddFriendButton({ user, selectedChat, friend }) {
       };
       await axios
         .post(
-          `https://zolachatapp.herokuapp.com/api/friendRequest/${friend._id}`,
+          `https://zolachatapp-sever.onrender.com/api/friendRequest/${friend._id}`,
           { friendRequestId: friend._id },
           config
         )

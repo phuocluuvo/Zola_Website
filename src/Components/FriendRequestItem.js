@@ -30,7 +30,7 @@ function FriendRequestItem({ friendRequest, user }) {
       };
       await axios
         .post(
-          `https://zolachatapp.herokuapp.com/api/friendRequest/accept/${friendRequest.user[0]._id}`,
+          `https://zolachatapp-sever.onrender.com/api/friendRequest/accept/${friendRequest.user[0]._id}`,
           { friendRequestId: friendRequest.user[0]._id },
           config
         )
@@ -65,7 +65,7 @@ function FriendRequestItem({ friendRequest, user }) {
       };
       await axios
         .post(
-          `https://zolachatapp.herokuapp.com/api/friendRequest/denied/${friendRequest.user[0]._id}`,
+          `https://zolachatapp-sever.onrender.com/api/friendRequest/denied/${friendRequest.user[0]._id}`,
           { friendRequestId: friendRequest.user[0]._id },
           config
         )

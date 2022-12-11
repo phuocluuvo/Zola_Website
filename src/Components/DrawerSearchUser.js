@@ -41,7 +41,7 @@ function DrawerSearchUser({ children }) {
         },
       };
       const { data } = await axios.post(
-        `https://zolachatapp.herokuapp.com/api/chat`,
+        `https://zolachatapp-sever.onrender.com/api/chat`,
         { userId },
         config
       );
@@ -81,7 +81,7 @@ function DrawerSearchUser({ children }) {
         },
       };
       const { data } = await axios.get(
-        `https://zolachatapp.herokuapp.com/api/user?search=${search}`,
+        `https://zolachatapp-sever.onrender.com/api/user?search=${search}`,
         config
       );
       setLoading(false);

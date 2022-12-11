@@ -46,7 +46,7 @@ function GroupChatModal({ children }) {
       };
 
       const { data } = await axios.get(
-        `https://zolachatapp.herokuapp.com/api/user?search=${search}`,
+        `https://zolachatapp-sever.onrender.com/api/user?search=${search}`,
         config
       );
       console.log(data);
@@ -88,7 +88,7 @@ function GroupChatModal({ children }) {
       };
 
       const { data } = await axios.post(
-        `https://zolachatapp.herokuapp.com/api/chat/group`,
+        `https://zolachatapp-sever.onrender.com/api/chat/group`,
         {
           name: groupChatName,
           users: JSON.stringify(selectedUsers.map((u) => u._id)),

@@ -51,7 +51,7 @@ function FriendsZone({ display, user, setIsDisplay }) {
       },
     };
     const { data } = await axios.get(
-      `https://zolachatapp.herokuapp.com/api/friends`,
+      `https://zolachatapp-sever.onrender.com/api/friends`,
       config
     );
     setFriends(data);
@@ -66,7 +66,7 @@ function FriendsZone({ display, user, setIsDisplay }) {
         },
       };
       const { data } = await axios.post(
-        `https://zolachatapp.herokuapp.com/api/chat`,
+        `https://zolachatapp-sever.onrender.com/api/chat`,
         { userId },
         config
       );
@@ -103,7 +103,7 @@ function FriendsZone({ display, user, setIsDisplay }) {
       };
       await axios
         .get(
-          `https://zolachatapp.herokuapp.com/api/friendRequest/sended`,
+          `https://zolachatapp-sever.onrender.com/api/friendRequest/sended`,
           config
         )
         .then((data) => {
@@ -136,7 +136,7 @@ function FriendsZone({ display, user, setIsDisplay }) {
       };
       await axios
         .get(
-          `https://zolachatapp.herokuapp.com/api/friendRequest/request`,
+          `https://zolachatapp-sever.onrender.com/api/friendRequest/request`,
           config
         )
         .then((data) => {

@@ -68,7 +68,7 @@ function SideBarClosed({ fetchAgain }) {
         cancelToken: source.token,
       };
       const { data } = await axios.get(
-        `https://zolachatapp.herokuapp.com/api/chat`,
+        `https://zolachatapp-sever.onrender.com/api/chat`,
         config
       );
       if (user) setChats(data);

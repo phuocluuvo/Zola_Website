@@ -19,7 +19,7 @@ export default function CallPage() {
   const [localStream, setlocalStream] = useState();
   async function getInfo() {
     await axios
-      .get(`https://zolachatapp.herokuapp.com/api/user/${user}/id`)
+      .get(`https://zolachatapp-sever.onrender.com/api/user/${user}/id`)
       .then((data) => {
         setFriend(data.data);
       });

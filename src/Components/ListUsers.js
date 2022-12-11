@@ -44,7 +44,7 @@ export default function ListUsers({ fetchAgain, setFetchAgain }) {
       };
 
       const { data } = await axios.put(
-        `https://zolachatapp.herokuapp.com/api/chat/groupremove`,
+        `https://zolachatapp-sever.onrender.com/api/chat/groupremove`,
         {
           chatId: selectedChat._id,
           userId: u._id,

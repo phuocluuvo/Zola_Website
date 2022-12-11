@@ -4,6 +4,15 @@ import {
   Divider,
   HStack,
   Input,
+  InputGroup,
+  InputLeftElement,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
   ScaleFade,
   Text,
   useToast,
@@ -24,6 +33,7 @@ import {
   where,
   addDoc,
 } from "firebase/firestore";
+import { EmailIcon } from "@chakra-ui/icons";
 const firebaseConfig = {
   apiKey: "AIzaSyCcsQTDiunGMp0qFDfG5L2Zq_yXgA3RCb4",
   authDomain: "authen-server-zola.firebaseapp.com",
@@ -37,7 +47,7 @@ const firebaseConfig = {
 function SignIn({ setShow, isOpen }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { setUser } = ChatState();
+  const { setUser, setForgotPass, forgotPass } = ChatState();
   let navigate = useNavigate();
   const toast = useToast();
   const [loading, setLoading] = useState(false);
@@ -45,7 +55,8 @@ function SignIn({ setShow, isOpen }) {
   const auth = getAuth(app);
   const db = getFirestore(app);
   const googleProvider = new GoogleAuthProvider();
-
+  const [modalShow, setModalShow] = useState(false);
+  const handleClose = () => setModalShow(false);
   const signInWithGoogle = async () => {
     try {
       const res = await signInWithPopup(auth, googleProvider);
@@ -72,7 +83,7 @@ function SignIn({ setShow, isOpen }) {
 
       const use = await axios
         .post(
-          "https://zolachatapp.herokuapp.com/api/user/:email",
+          "https://zolachatapp-sever.onrender.com/api/user/:email",
           {
             email: user.email,
           },
@@ -82,7 +93,7 @@ function SignIn({ setShow, isOpen }) {
 
       if (use.data === "a") {
         const { data } = await axios.post(
-          "https://zolachatapp.herokuapp.com/api/user",
+          "https://zolachatapp-sever.onrender.com/api/user",
           {
             username: user.displayName,
             fullname: user.displayName,
@@ -105,7 +116,7 @@ function SignIn({ setShow, isOpen }) {
         });
       } else if (use) {
         const { data } = await axios.post(
-          "https://zolachatapp.herokuapp.com/api/user/login",
+          "https://zolachatapp-sever.onrender.com/api/user/login",
           {
             email: user.email,
             password: user.uid,
@@ -129,7 +140,33 @@ function SignIn({ setShow, isOpen }) {
       alert(error.message);
     }
   };
-
+  const sendCodeLink = async () => {
+    const config = {
+      headers: {
+        "Content-type": "application/json",
+      },
+    };
+    setForgotPass(true);
+    await axios
+      .post(
+        "/api/user/forgot-password/:email",
+        {
+          email: email,
+        },
+        config
+      )
+      .then(() => {
+        localStorage.setItem("forgotInfo", forgotPass);
+        toast({
+          title: "Please check email.",
+          status: "success",
+          duration: 2500,
+          isClosable: true,
+          position: "bottom",
+        });
+      })
+      .catch((err) => console.log(err));
+  };
   const submitHandler = async () => {
     setLoading(true);
     if (!email || !password) {
@@ -152,12 +189,12 @@ function SignIn({ setShow, isOpen }) {
       };
 
       const { data } = await axios.post(
-        "https://zolachatapp.herokuapp.com/api/user/login",
+        "https://zolachatapp-sever.onrender.com/api/user/login",
         { email, password },
         config
       );
       const verify = await axios.post(
-        "https://zolachatapp.herokuapp.com/api/user/:email",
+        "https://zolachatapp-sever.onrender.com/api/user/:email",
         {
           email: email,
         },
@@ -201,6 +238,48 @@ function SignIn({ setShow, isOpen }) {
   };
   return (
     <ScaleFade initialScale={0.9} in={isOpen}>
+      <Modal
+        isOpen={modalShow}
+        onClose={handleClose}
+        // modalShow={modalShow} onHide={handleClose}
+        color="blue"
+      >
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Forgot Password</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <InputGroup size="md" mb={0} h={45}>
+              <InputLeftElement
+                display={"flex"}
+                justifyContent="center"
+                alignItems={"center"}
+              >
+                <EmailIcon color={"blackAlpha.900"} />
+              </InputLeftElement>
+              <Input
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="abc@gmail.com"
+              />
+            </InputGroup>
+          </ModalBody>
+          <ModalFooter>
+            <span className="font-bold">
+              <Button
+                variant="link"
+                colorScheme={"whiteAlpha.900"}
+                _hover={{
+                  bgClip: "text",
+                  bgGradient: "linear(to-br,blue.300,red.300)",
+                }}
+                onClick={sendCodeLink}
+              >
+                Forgot Password
+              </Button>
+            </span>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
       <VStack marginY={"2.5rem"} zIndex={10}>
         <Input
           type={"email"}
@@ -229,17 +308,19 @@ function SignIn({ setShow, isOpen }) {
           textColor={"gray.500"}
         />
 
-        <Text
+        <Button
           transitionDuration={"150ms"}
-          textAlign="right"
+          variant="link"
           textColor={"whiteAlpha.900"}
+          colorScheme={"whiteAlpha.00"}
           _hover={{
             bgClip: "text",
-            bgGradient: "linear(to-br,blue.300, pink.400)",
+            bgGradient: "linear(to-br,blue.300,red.300)",
           }}
+          onClick={() => setModalShow(true)}
         >
           forgot password, eh? Press here, bro.
-        </Text>
+        </Button>
         <Box zIndex={10}>
           <Button
             variant={"link"}

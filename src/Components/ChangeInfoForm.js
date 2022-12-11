@@ -83,7 +83,7 @@ function ChangeInfoForm({ userUpdate }) {
 
       await axios
         .put(
-          "https://zolachatapp.herokuapp.com/api/user/update/",
+          "https://zolachatapp-sever.onrender.com/api/user/update/",
           {
             _id: values._id,
             fullname: values.fullname,
@@ -127,7 +127,7 @@ function ChangeInfoForm({ userUpdate }) {
         };
         await axios
           .post(
-            "https://zolachatapp.herokuapp.com/api/user/checkusername/:username",
+            "https://zolachatapp-sever.onrender.com/api/user/checkusername/:username",
             { username: value },
             config
           )

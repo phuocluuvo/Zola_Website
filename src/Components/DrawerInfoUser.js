@@ -50,7 +50,7 @@ export default function DrawerInfoUser({ _user }) {
       setLoading(true);
       await axios
         .get(
-          `https://zolachatapp.herokuapp.com/api/message/${selectedChat._id}`,
+          `https://zolachatapp-sever.onrender.com/api/message/${selectedChat._id}`,
           config
         )
         .then((data) => {

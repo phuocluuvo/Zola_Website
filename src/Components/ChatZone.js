@@ -98,7 +98,7 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
       setLoading(true);
       await axios
         .get(
-          `https://zolachatapp.herokuapp.com/api/message/${
+          `https://zolachatapp-sever.onrender.com/api/message/${
             selectedChat._id
           }/${1}`,
           config
@@ -225,7 +225,7 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
         setNewMessage("");
         await axios
           .post(
-            "https://zolachatapp.herokuapp.com/api/message",
+            "https://zolachatapp-sever.onrender.com/api/message",
             {
               multiMedia: pic,
               multiFile: file,
@@ -292,7 +292,7 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
     setNewMessage("");
     axios
       .post(
-        "https://zolachatapp.herokuapp.com/api/message",
+        "https://zolachatapp-sever.onrender.com/api/message",
         {
           content: "📞 A call was made by " + user.username,
           chatId: selectedChat._id,

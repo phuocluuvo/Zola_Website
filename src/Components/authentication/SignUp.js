@@ -123,7 +123,7 @@ function SignUp({ setShow }) {
         };
 
         const { data } = await axios.post(
-          "https://zolachatapp.herokuapp.com/api/user",
+          "https://zolachatapp-sever.onrender.com/api/user",
           { username, fullname, email, password, pic },
           config
         );
@@ -162,7 +162,7 @@ function SignUp({ setShow }) {
 
     await axios
       .post(
-        "https://zolachatapp.herokuapp.com/api/user/:email",
+        "https://zolachatapp-sever.onrender.com/api/user/:email",
         {
           email: email,
         },
@@ -170,7 +170,7 @@ function SignUp({ setShow }) {
       )
       .then((data) => {
         axios
-          .post("https://zolachatapp.herokuapp.com/api/user/verify", {
+          .post("https://zolachatapp-sever.onrender.com/api/user/verify", {
             userId: data.data._id,
             otp: OTP.otp,
           })
@@ -212,7 +212,7 @@ function SignUp({ setShow }) {
       };
       await axios
         .post(
-          "https://zolachatapp.herokuapp.com/api/user/checkemail/:email",
+          "https://zolachatapp-sever.onrender.com/api/user/checkemail/:email",
           { email: query },
           config
         )
@@ -251,7 +251,7 @@ function SignUp({ setShow }) {
         };
         await axios
           .post(
-            "https://zolachatapp.herokuapp.com/api/user/checkusername/:username",
+            "https://zolachatapp-sever.onrender.com/api/user/checkusername/:username",
             { username: username },
             config
           )

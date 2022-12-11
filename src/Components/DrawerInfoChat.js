@@ -99,7 +99,7 @@ export default function DrawerInfoChat({ fetchAgain, setFetchAgain }) {
       };
 
       const { data } = await axios.put(
-        `https://zolachatapp.herokuapp.com/api/chat/groupremove`,
+        `https://zolachatapp-sever.onrender.com/api/chat/groupremove`,
         {
           chatId: selectedChat._id,
           userId: u._id,
@@ -132,7 +132,7 @@ export default function DrawerInfoChat({ fetchAgain, setFetchAgain }) {
         },
       };
       const { data } = await axios.put(
-        "https://zolachatapp.herokuapp.com/api/chat/rename",
+        "https://zolachatapp-sever.onrender.com/api/chat/rename",
         {
           chatId: selectedChat._id,
           chatName: groupChatName,
@@ -167,7 +167,7 @@ export default function DrawerInfoChat({ fetchAgain, setFetchAgain }) {
       };
 
       const { data } = await axios.get(
-        `https://zolachatapp.herokuapp.com/api/user?search=${search}`,
+        `https://zolachatapp-sever.onrender.com/api/user?search=${search}`,
         config
       );
 
@@ -217,7 +217,7 @@ export default function DrawerInfoChat({ fetchAgain, setFetchAgain }) {
       };
 
       const { data } = await axios.put(
-        `https://zolachatapp.herokuapp.com/api/chat/groupadd`,
+        `https://zolachatapp-sever.onrender.com/api/chat/groupadd`,
         {
           chatId: selectedChat._id,
           userId: u._id,

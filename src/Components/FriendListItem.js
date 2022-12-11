@@ -48,7 +48,7 @@ function FriendListItem({ user, handleFunction }) {
       };
       await axios
         .post(
-          `https://zolachatapp.herokuapp.com/api/friends/deletefriend/${user._id}`,
+          `https://zolachatapp-sever.onrender.com/api/friends/deletefriend/${user._id}`,
           { friendRequestId: user._id },
           config
         )

@@ -16,7 +16,7 @@ export default function useMessagePagination(user, chat, pageNumber) {
 
       await axios
         .get(
-          `https://zolachatapp.herokuapp.com/api/message/${chat._id}/${pageNumber}`,
+          `https://zolachatapp-sever.onrender.com/api/message/${chat._id}/${pageNumber}`,
           {
             headers: {
               "Content-type": "application/json",

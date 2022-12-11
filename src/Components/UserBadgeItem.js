@@ -51,7 +51,7 @@ function UserBadgeItem({
       };
       await axios
         .put(
-          `https://zolachatapp.herokuapp.com/chat/changeAdmin`,
+          `https://zolachatapp-sever.onrender.com/chat/changeAdmin`,
           {
             chatId: selectedChat._id,
             userId: _user._id,

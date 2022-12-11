@@ -43,7 +43,7 @@ function SideBarFriendsZone({
       },
     };
     const { data } = await axios.get(
-      `https://zolachatapp.herokuapp.com/api/friends`,
+      `https://zolachatapp-sever.onrender.com/api/friends`,
       config
     );
     setFriends(data);
@@ -59,7 +59,7 @@ function SideBarFriendsZone({
         },
       };
       const { data } = await axios.post(
-        `https://zolachatapp.herokuapp.com/api/chat`,
+        `https://zolachatapp-sever.onrender.com/api/chat`,
         { userId },
         config
       );
