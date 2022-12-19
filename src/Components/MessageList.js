@@ -1,4 +1,4 @@
-import { Box } from "@chakra-ui/react";
+import { Box, Spinner, Text } from "@chakra-ui/react";
 import React, { useCallback, useRef } from "react";
 import ScrollableFeed from "react-scrollable-feed";
 
@@ -28,7 +28,12 @@ function MessageList({
   );
   return (
     <ScrollableFeed className="pt-16 px-4 w-full scrollbar-thin scroll-smooth scrollbar-thumb-slate-600">
-      <div>{loadingMessage && "Loading..."}</div>
+      {loadingMessage && (
+        <Box w={"full"} textAlign="center" display="flex">
+          <Text>Loading...</Text>
+          <Spinner size={"sm"}></Spinner>
+        </Box>
+      )}
       <div>{error && "Error"}</div>
       {messages.map((m, i) =>
         i === 0 ? (
