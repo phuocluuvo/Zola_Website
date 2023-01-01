@@ -18,11 +18,11 @@ function ProfileModal({ user, children }) {
   console.log("ProfileModal is rendered");
   return (
     <>
-      {children && (
+      {children ? (
         <span onClick={onOpen} style={{ cursor: "pointer" }}>
           {children}
         </span>
-      )}
+      ) : null}
       <Modal
         size={{ base: "full", md: "md" }}
         isOpen={isOpen}

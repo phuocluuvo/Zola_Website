@@ -683,7 +683,7 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                       theme={colorMode ? Theme.DARK : Theme.LIGHT}
                     />
                   </Box>
-                  {pic && (
+                  {pic ? (
                     <>
                       <Image
                         pos="absolute"
@@ -707,7 +707,7 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                         onClick={() => setPic("")}
                       ></IconButton>
                     </>
-                  )}
+                  ) : null}
 
                   <InputGroup
                     display={"flex"}

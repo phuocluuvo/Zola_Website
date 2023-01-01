@@ -28,12 +28,12 @@ function MessageList({
   );
   return (
     <ScrollableFeed className="pt-16 px-4 w-full scrollbar-thin scroll-smooth scrollbar-thumb-slate-600">
-      {loadingMessage && (
+      {loadingMessage ? (
         <Box w={"full"} textAlign="center" display="flex">
           <Text>Loading...</Text>
           <Spinner size={"sm"}></Spinner>
         </Box>
-      )}
+      ) : null}
       <div>{error && "Error"}</div>
       {messages.map((m, i) =>
         i === 0 ? (

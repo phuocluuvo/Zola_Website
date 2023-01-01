@@ -80,115 +80,113 @@ function UserBadgeItem({
   const { isOpen, onOpen, onClose } = useDisclosure();
   const cancelRef = React.useRef();
 
-  return (
-    !isAdmin && (
-      <>
-        <Box
-          px={2}
-          py={1}
-          borderRadius="lg"
-          m={1}
-          mb={2}
-          display="flex"
-          justifyContent={"space-between"}
-          alignItems="center"
-          justifyItems="center"
-          variant="solid"
-          textColor={"blackAlpha.900"}
-          cursor="pointer"
-          opacity="0.7"
-          transition="all 0.25s ease-in-out"
-          _hover={!isAdmin && { opacity: "1" }}
-          bgGradient={bgColor}
-        >
-          <Avatar
-            src={_user?.pic}
-            size={user._id === selectedChat.chatAdmin._id ? "xs" : "md"}
-          />
-          <Box flex="1" px="2">
-            <ProfileModal user={_user}>
-              <Text
-                textColor={
-                  colorMode === "light" ? "blackAlpha.900" : "whiteAlpha.900"
-                }
-                fontSize={15}
-                _hover={{ textDecor: "underline" }}
-              >
-                @{_user?.username}
-              </Text>
-              <Badge ml="1" colorScheme="gray">
-                Member
-              </Badge>
-            </ProfileModal>
-          </Box>
-          {user._id === selectedChat.chatAdmin._id && (
-            <>
-              <Tooltip
-                label={`Promte @${_user?.username} become Group Admin`}
-                openDelay={300}
-              >
-                <IconButton
-                  onClick={onOpen}
-                  variant={"ghost"}
-                  _hover={{
-                    bg: "none",
-                    textColor: "yellow",
-                    transform: "rotate(75deg)",
-                    transitionDuration: "500ms",
-                  }}
-                  aria-label={`Remove @${_user?.username}`}
-                  icon={<StarIcon fontSize={12} />}
-                ></IconButton>
-              </Tooltip>
-              <Tooltip label={`Remove @${_user?.username}`} openDelay={300}>
-                <IconButton
-                  onClick={handleFunction}
-                  variant={"ghost"}
-                  _hover={{
-                    bg: "none",
-                    textColor: "red",
-                    transform: "rotate(180deg)",
-                  }}
-                  aria-label={`Remove @${_user?.username}`}
-                  icon={<CloseIcon fontSize={12} />}
-                ></IconButton>
-              </Tooltip>
-            </>
-          )}
+  return !isAdmin ? (
+    <>
+      <Box
+        px={2}
+        py={1}
+        borderRadius="lg"
+        m={1}
+        mb={2}
+        display="flex"
+        justifyContent={"space-between"}
+        alignItems="center"
+        justifyItems="center"
+        variant="solid"
+        textColor={"blackAlpha.900"}
+        cursor="pointer"
+        opacity="0.7"
+        transition="all 0.25s ease-in-out"
+        _hover={!isAdmin && { opacity: "1" }}
+        bgGradient={bgColor}
+      >
+        <Avatar
+          src={_user?.pic}
+          size={user._id === selectedChat.chatAdmin._id ? "xs" : "md"}
+        />
+        <Box flex="1" px="2">
+          <ProfileModal user={_user}>
+            <Text
+              textColor={
+                colorMode === "light" ? "blackAlpha.900" : "whiteAlpha.900"
+              }
+              fontSize={15}
+              _hover={{ textDecor: "underline" }}
+            >
+              @{_user?.username}
+            </Text>
+            <Badge ml="1" colorScheme="gray">
+              Member
+            </Badge>
+          </ProfileModal>
         </Box>
-        {isAdmin && (
-          <AlertDialog
-            motionPreset="slideInBottom"
-            leastDestructiveRef={cancelRef}
-            onClose={onClose}
-            isOpen={isOpen}
-            isCentered
-          >
-            <AlertDialogOverlay />
+        {user._id === selectedChat.chatAdmin._id ? (
+          <>
+            <Tooltip
+              label={`Promte @${_user?.username} become Group Admin`}
+              openDelay={300}
+            >
+              <IconButton
+                onClick={onOpen}
+                variant={"ghost"}
+                _hover={{
+                  bg: "none",
+                  textColor: "yellow",
+                  transform: "rotate(75deg)",
+                  transitionDuration: "500ms",
+                }}
+                aria-label={`Remove @${_user?.username}`}
+                icon={<StarIcon fontSize={12} />}
+              ></IconButton>
+            </Tooltip>
+            <Tooltip label={`Remove @${_user?.username}`} openDelay={300}>
+              <IconButton
+                onClick={handleFunction}
+                variant={"ghost"}
+                _hover={{
+                  bg: "none",
+                  textColor: "red",
+                  transform: "rotate(180deg)",
+                }}
+                aria-label={`Remove @${_user?.username}`}
+                icon={<CloseIcon fontSize={12} />}
+              ></IconButton>
+            </Tooltip>
+          </>
+        ) : null}
+      </Box>
+      {isAdmin ? (
+        <AlertDialog
+          motionPreset="slideInBottom"
+          leastDestructiveRef={cancelRef}
+          onClose={onClose}
+          isOpen={isOpen}
+          isCentered
+        >
+          <AlertDialogOverlay />
 
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                Promte @{_user?.username} to Group Admin?
-              </AlertDialogHeader>
-              <AlertDialogCloseButton />
-              <AlertDialogBody>
-                Are you sure you want to discard all of your notes? 44 words
-                will be deleted.
-              </AlertDialogBody>
-              <AlertDialogFooter>
-                <Button ref={cancelRef} onClick={onClose}>
-                  No
-                </Button>
-                <Button colorScheme="yellow" ml={3} onClick={handleChangeAdmin}>
-                  Yes
-                </Button>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-        )}
-      </>
-    )
-  );
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              Promte @{_user?.username} to Group Admin?
+            </AlertDialogHeader>
+            <AlertDialogCloseButton />
+            <AlertDialogBody>
+              Are you sure you want to discard all of your notes? 44 words will
+              be deleted.
+            </AlertDialogBody>
+            <AlertDialogFooter>
+              <Button ref={cancelRef} onClick={onClose}>
+                No
+              </Button>
+              <Button colorScheme="yellow" ml={3} onClick={handleChangeAdmin}>
+                Yes
+              </Button>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      ) : null}
+    </>
+  ) : null;
 }
 
 export default UserBadgeItem;

@@ -9,7 +9,6 @@ import {
   Avatar,
   Box,
   Button,
-  color,
   IconButton,
   Menu,
   MenuButton,
@@ -28,7 +27,7 @@ import { HiOutlineDotsVertical } from "react-icons/hi";
 import ProfileModal from "./ProfileModal";
 function FriendListItem({ user, handleFunction }) {
   const [isLoading, setIsLoading] = useBoolean(false);
-  const [isAcceptedSuccess, setAcceptedSuccess] = useBoolean(false);
+
   const [isDeniedSuccess, setDeniedSuccess] = useBoolean(false);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const cancelRef = React.useRef();
@@ -52,7 +51,7 @@ function FriendListItem({ user, handleFunction }) {
           { friendRequestId: user._id },
           config
         )
-        .then((data) => {
+        .then(() => {
           setIsLoading.off();
           setDeniedSuccess.off();
           onClose();

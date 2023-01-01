@@ -119,8 +119,8 @@ function MessageItem({ messages, setMessages, m, i }) {
         onMouseLeave={() => setIsHover(false)}
       >
         {/** messages, m, i, _id */}
-        {(isSameSender(messages, m, i, user._id) ||
-          isLastMessage(messages, i, user._id)) && (
+        {isSameSender(messages, m, i, user._id) ||
+        isLastMessage(messages, i, user._id) ? (
           <Tooltip
             label={"@" + m.sender.username}
             hasArrow
@@ -138,7 +138,7 @@ function MessageItem({ messages, setMessages, m, i }) {
               marginTop={isSameUserMargin(messages, m, i, user._id) ? 0 : 45}
             />
           </Tooltip>
-        )}
+        ) : null}
 
         <Box
           className="shadow-lg"
@@ -164,7 +164,7 @@ function MessageItem({ messages, setMessages, m, i }) {
           marginTop={isSameUserMargin(messages, m, i, user._id) ? "auto" : 30}
           position={"relative"}
         >
-          {m?.response && (
+          {m?.response ? (
             <Box pos="relative">
               <Text
                 fontSize={"xs"}
@@ -204,7 +204,7 @@ function MessageItem({ messages, setMessages, m, i }) {
                 )}
               </Box>
             </Box>
-          )}
+          ) : null}
           <Text
             fontSize={{ base: "sm", md: "md" }}
             width={"fit-content"}
@@ -261,8 +261,8 @@ function MessageItem({ messages, setMessages, m, i }) {
             />
           )}
           {m?.multiVideo && <VideoPlayer src={m?.multiVideo} />}
-          {(isSameSender(messages, m, i, user._id) ||
-            isLastMessage(messages, i, user._id)) && (
+          {isSameSender(messages, m, i, user._id) ||
+          isLastMessage(messages, i, user._id) ? (
             <Text
               width={"fit-content"}
               fontSize={9}
@@ -273,7 +273,7 @@ function MessageItem({ messages, setMessages, m, i }) {
             >
               {moment(m.createdAt).calendar()}
             </Text>
-          )}
+          ) : null}
           <Box
             display={isHover && m.content !== "deleted" ? "flex" : "none"}
             position="absolute"

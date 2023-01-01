@@ -239,143 +239,141 @@ export default function DrawerInfoChat({ fetchAgain, setFetchAgain }) {
       setLoading(false);
     }
   };
-  return (
-    selectedChat.isGroupChat && (
-      <>
-        <IconButton
-          variant={"ghost"}
-          className="transition-opacity"
-          borderRadius="full"
-          onClick={onOpen}
-          transform="unset"
-          ml={3}
-          _hover={{
-            color: "black",
-            bgGradient:
-              colorMode === "light"
-                ? "radial-gradient(circle, rgba(238,174,202,1) 0%, rgba(148,187,233,1) 100%)"
-                : "linear(to-b,#1E2B6F,#193F5F)",
-          }}
-          icon={
-            colorMode === "light" ? (
-              <HamburgerIcon textColor={"whiteAlpha.900"} />
-            ) : (
-              <HamburgerIcon textColor={"yellow"} />
-            )
-          }
-        />
-        <Drawer
-          isOpen={isOpen}
-          placement="right"
-          onClose={onClose}
-          size={{ base: "full", md: "sm" }}
-          finalFocusRef={btnRef}
-        >
-          <DrawerOverlay />
-          <DrawerContent>
-            <DrawerCloseButton
-              top={{ base: 5, md: 7 }}
-              right={{ base: 5, md: 10 }}
-            />
-            <DrawerHeader
-              mt={5}
-              fontSize="25px"
-              fontFamily="Work Sans"
+  return selectedChat.isGroupChat ? (
+    <>
+      <IconButton
+        variant={"ghost"}
+        className="transition-opacity"
+        borderRadius="full"
+        onClick={onOpen}
+        transform="unset"
+        ml={3}
+        _hover={{
+          color: "black",
+          bgGradient:
+            colorMode === "light"
+              ? "radial-gradient(circle, rgba(238,174,202,1) 0%, rgba(148,187,233,1) 100%)"
+              : "linear(to-b,#1E2B6F,#193F5F)",
+        }}
+        icon={
+          colorMode === "light" ? (
+            <HamburgerIcon textColor={"whiteAlpha.900"} />
+          ) : (
+            <HamburgerIcon textColor={"yellow"} />
+          )
+        }
+      />
+      <Drawer
+        isOpen={isOpen}
+        placement="right"
+        onClose={onClose}
+        size={{ base: "full", md: "sm" }}
+        finalFocusRef={btnRef}
+      >
+        <DrawerOverlay />
+        <DrawerContent>
+          <DrawerCloseButton
+            top={{ base: 5, md: 7 }}
+            right={{ base: 5, md: 10 }}
+          />
+          <DrawerHeader
+            mt={5}
+            fontSize="25px"
+            fontFamily="Work Sans"
+            display="flex"
+            justifyContent="center"
+          >
+            <Editable
+              textAlign="center"
+              defaultValue={selectedChat?.chatName.toUpperCase()}
+              onSubmit={handleRename}
+              fontSize="2xl"
               display="flex"
+              alignItems={"center"}
               justifyContent="center"
+              isPreviewFocusable={false}
             >
-              <Editable
-                textAlign="center"
-                defaultValue={selectedChat?.chatName.toUpperCase()}
-                onSubmit={handleRename}
-                fontSize="2xl"
-                display="flex"
-                alignItems={"center"}
-                justifyContent="center"
-                isPreviewFocusable={false}
-              >
-                <EditablePreview />
-                {/* Here is the custom input */}
-                <Input
-                  value={groupChatName}
-                  as={EditableInput}
-                  onChange={(e) => setGroupChatName(e.target.value)}
-                />
-                <EditableControls />
-              </Editable>
-            </DrawerHeader>
-            <DrawerBody>
-              <Tabs onChange={(index) => setTabIndex(index)} variant="enclosed">
-                <TabList mb="1em">
-                  <Tab>
-                    {tabIndex === 0 && <HiUserAdd mx="2" />}
-                    <Text fontSize={13}>Add a User</Text>
-                  </Tab>
-                  <Tab>
-                    {tabIndex === 1 && <HiUserGroup mx="2" />}
-                    <Text fontSize={13}>Group Members</Text>
-                  </Tab>
-                </TabList>
-                <TabPanels>
-                  <TabPanel display={"flex"} flexDir="column">
-                    <FormControl>
-                      <FormLabel>Add User to Group</FormLabel>
-                      <Input
-                        placeholder="Add user to group"
-                        mb={1}
-                        onChange={(e) => handleSearch(e.target.value)}
-                      />
-                    </FormControl>
-                    <Box
-                      h="fit-content"
-                      maxHeight={350}
-                      overflowY={"scroll"}
-                      className="scrollbar-thin scrollbar-thumb-slate-300 scroll-smooth hover:scrollbar-thumb-slate-500"
-                    >
-                      {loading ? (
-                        <Spinner size="lg" />
-                      ) : (
-                        searchResult?.map((u) => (
-                          <UserListItem
-                            key={u._id}
-                            user={u}
-                            handleFunction={() => handleAddUser(u)}
-                          />
-                        ))
-                      )}{" "}
-                    </Box>
-                  </TabPanel>
-                  <TabPanel>
-                    <ListUsers />
-                  </TabPanel>
-                </TabPanels>
-              </Tabs>
-            </DrawerBody>
+              <EditablePreview />
+              {/* Here is the custom input */}
+              <Input
+                value={groupChatName}
+                as={EditableInput}
+                onChange={(e) => setGroupChatName(e.target.value)}
+              />
+              <EditableControls />
+            </Editable>
+          </DrawerHeader>
+          <DrawerBody>
+            <Tabs onChange={(index) => setTabIndex(index)} variant="enclosed">
+              <TabList mb="1em">
+                <Tab>
+                  {tabIndex === 0 ? <HiUserAdd mx="2" /> : null}
+                  <Text fontSize={13}>Add a User</Text>
+                </Tab>
+                <Tab>
+                  {tabIndex === 1 ? <HiUserGroup mx="2" /> : null}
+                  <Text fontSize={13}>Group Members</Text>
+                </Tab>
+              </TabList>
+              <TabPanels>
+                <TabPanel display={"flex"} flexDir="column">
+                  <FormControl>
+                    <FormLabel>Add User to Group</FormLabel>
+                    <Input
+                      placeholder="Add user to group"
+                      mb={1}
+                      onChange={(e) => handleSearch(e.target.value)}
+                    />
+                  </FormControl>
+                  <Box
+                    h="fit-content"
+                    maxHeight={350}
+                    overflowY={"scroll"}
+                    className="scrollbar-thin scrollbar-thumb-slate-300 scroll-smooth hover:scrollbar-thumb-slate-500"
+                  >
+                    {loading ? (
+                      <Spinner size="lg" />
+                    ) : (
+                      searchResult?.map((u) => (
+                        <UserListItem
+                          key={u._id}
+                          user={u}
+                          handleFunction={() => handleAddUser(u)}
+                        />
+                      ))
+                    )}{" "}
+                  </Box>
+                </TabPanel>
+                <TabPanel>
+                  <ListUsers />
+                </TabPanel>
+              </TabPanels>
+            </Tabs>
+          </DrawerBody>
 
-            <DrawerFooter display={"flex"} justifyContent="space-between">
-              <Button
-                isDisabled={user._id === selectedChat?.chatAdmin._id}
-                colorScheme="red"
-                variant={colorMode === "dark" && "outline"}
-                onClick={() => {
-                  handleRemove(user);
-                  onClose();
-                }}
-              >
-                Leave Group
-              </Button>
-              <Text
-                fontSize="xs"
-                px="3"
-                display={user._id !== selectedChat?.chatAdmin._id && "none"}
-              >
-                (*) You must promote another member to be Admin so you can leave
-                group.
-              </Text>
-            </DrawerFooter>
-          </DrawerContent>
-        </Drawer>
-      </>
-    )
-  );
+          <DrawerFooter display={"flex"} justifyContent="space-between">
+            <Button
+              isDisabled={user._id === selectedChat?.chatAdmin._id}
+              colorScheme="red"
+              variant={colorMode === "dark" && "outline"}
+              onClick={() => {
+                handleRemove(user);
+                onClose();
+              }}
+            >
+              Leave Group
+            </Button>
+            <Text
+              fontSize="xs"
+              px="3"
+              display={user._id !== selectedChat?.chatAdmin._id && "none"}
+            >
+              (*) You must promote another member to be Admin so you can leave
+              group.
+            </Text>
+          </DrawerFooter>
+        </DrawerContent>
+      </Drawer>
+    </>
+  ) : null;
 }

@@ -1,7 +1,5 @@
 import {
-  Avatar,
   Box,
-  Divider,
   Grid,
   GridItem,
   HStack,
@@ -20,7 +18,6 @@ import {
 } from "@chakra-ui/react";
 import axios from "axios";
 import { IoMdListBox } from "react-icons/io";
-import { HiUserAdd } from "react-icons/hi";
 import { FaUserFriends, FaUserPlus } from "react-icons/fa";
 
 import React, { useEffect, useState } from "react";
@@ -325,34 +322,35 @@ function FriendsZone({ display, user, setIsDisplay }) {
                 }}
                 gap={6}
               >
-                {friends.length > 0 &&
-                  friends.map((user) => (
-                    <GridItem
-                      key={user._id}
-                      border="1px solid"
-                      borderColor={colorMode === "light" && "blackAlpha.300"}
-                      bg={colorMode === "light" ? "white" : "whiteAlpha.200"}
-                      opacity="0.8"
-                      className="transition-opacity"
-                      _hover={{ opacity: 1 }}
-                      rounded="lg"
-                      boxShadow={"lg"}
-                    >
-                      <FriendListItem
-                        user={user}
-                        handleFunction={() => accessChat(user._id)}
-                      />
-                    </GridItem>
-                  ))}
+                {friends.length > 0
+                  ? friends.map((user) => (
+                      <GridItem
+                        key={user._id}
+                        border="1px solid"
+                        borderColor={colorMode === "light" && "blackAlpha.300"}
+                        bg={colorMode === "light" ? "white" : "whiteAlpha.200"}
+                        opacity="0.8"
+                        className="transition-opacity"
+                        _hover={{ opacity: 1 }}
+                        rounded="lg"
+                        boxShadow={"lg"}
+                      >
+                        <FriendListItem
+                          user={user}
+                          handleFunction={() => accessChat(user._id)}
+                        />
+                      </GridItem>
+                    ))
+                  : null}
               </Grid>
-              {friends.length <= 0 && (
+              {friends.length <= 0 ? (
                 <VStack opacity="0.5" m="auto">
                   <RiEmotionSadFill fontSize={"100"} />
                   <Text textAlign={"center"}>
                     You seems so lonely, find some friend to add to the list
                   </Text>
                 </VStack>
-              )}
+              ) : null}
             </TabPanel>
           </TabPanels>
         </Tabs>

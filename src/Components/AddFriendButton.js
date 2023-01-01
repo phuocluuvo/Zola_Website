@@ -137,7 +137,7 @@ function AddFriendButton({ user, selectedChat, friend }) {
       </AlertDialog>
       <Text>
         {getSender(user, selectedChat.users)}{" "}
-        {!isExistInArray(getSenderInfo(user, selectedChat.users), friends) && (
+        {!isExistInArray(getSenderInfo(user, selectedChat.users), friends) ? (
           <>
             <Badge colorScheme={"facebook"} mx="2">
               Stranger
@@ -150,7 +150,7 @@ function AddFriendButton({ user, selectedChat, friend }) {
               onClick={onOpen}
             ></IconButton>
           </>
-        )}
+        ) : null}
       </Text>
     </>
   );
