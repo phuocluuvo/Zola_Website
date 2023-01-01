@@ -39,7 +39,7 @@ const firebaseConfig = {
   authDomain: "authen-server-zola.firebaseapp.com",
   projectId: "authen-server-zola",
   storageBucket: "authen-server-zola.appspot.com",
-  messagingSenderId: process.env.MESAGING_ID,
+  messagingSenderId: process.env.MESSAGING_SENDER_ID,
   appId: process.env.APP_ID,
   measurementId: process.env.MEASUREMENT_ID,
 };
