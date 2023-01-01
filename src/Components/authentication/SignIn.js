@@ -35,13 +35,13 @@ import {
 } from "firebase/firestore";
 import { EmailIcon } from "@chakra-ui/icons";
 const firebaseConfig = {
-  apiKey: "AIzaSyCcsQTDiunGMp0qFDfG5L2Zq_yXgA3RCb4",
+  apiKey: process.env.API_KEY,
   authDomain: "authen-server-zola.firebaseapp.com",
   projectId: "authen-server-zola",
   storageBucket: "authen-server-zola.appspot.com",
-  messagingSenderId: "514728568830",
-  appId: "1:514728568830:web:eba8144d502e759045c2af",
-  measurementId: "G-XYCVGGYCK3",
+  messagingSenderId: process.env.MESAGING_ID,
+  appId: process.env.APP_ID,
+  measurementId: process.env.MEASUREMENT_ID,
 };
 
 function SignIn({ setShow, isOpen }) {
