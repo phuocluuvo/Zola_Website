@@ -36,7 +36,7 @@ import {
 import { EmailIcon } from "@chakra-ui/icons";
 
 const firebaseConfig = {
-  apiKey: process.env.API_KEY,
+  apiKey: process.env.REACT_APP_API_KEY,
   authDomain: "authen-server-zola.firebaseapp.com",
   projectId: "authen-server-zola",
   storageBucket: "authen-server-zola.appspot.com",
