@@ -29,26 +29,31 @@ import io from "socket.io-client";
 import React, { useEffect, useRef, useState } from "react";
 import { getSender, getSenderInfo } from "../logic/ChatLogic";
 import { ChatState } from "../providers/ChatProvider";
-import MessageList from "./MessageList";
+import MessageList from "./modal/MessageList";
 import animationData from "../animations/81154-typing-in-chat.json";
-import UpdateGroupChatModal from "./UpdateGroupChatModal";
+import UpdateGroupChatModal from "./modal/UpdateGroupChatModal";
 import moment from "moment";
 import useMessagePagination from "../hooks/useMessagePagination";
-import DrawerInfoChat from "./DrawerInfoChat";
-import DrawerInfoUser from "./DrawerInfoUser";
+import DrawerInfoChat from "./drawer/DrawerInfoChat";
+import DrawerInfoUser from "./drawer/DrawerInfoUser";
 import { IoResize } from "react-icons/io5";
 import { RiSendPlaneFill } from "react-icons/ri";
 import { AiFillSmile } from "react-icons/ai";
 import { MdAddPhotoAlternate } from "react-icons/md";
-import UploadMenuButton from "./UploadMenuButton";
-import AddFriendButton from "./AddFriendButton";
+import UploadMenuButton from "./button/UploadMenuButton";
+import AddFriendButton from "./button/AddFriendButton";
 import { HiVideoCamera } from "react-icons/hi";
+import {
+  getMessagesPagination,
+  sendMedia,
+  sendNewMessage,
+} from "../apis/messages.api";
 
-const ENDPOINT = "https://zolachatapp-sever.onrender.com";
+const ENDPOINT = process.env.REACT_APP_PORT;
 
 let socket, selectedChatCompare;
 function ChatZone({ fetchAgain, setFetchAgain }) {
-  const { colorMode, toggleColorMode } = useColorMode();
+  const { colorMode } = useColorMode();
   const bgColor = useColorModeValue(
     "linear(to-b,whiteAlpha.900,#B1AEC6)",
     "linear(to-b,#1E2B6F,#193F5F)"
@@ -61,8 +66,6 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
   const [isTyping, setIsTyping] = useState(false);
   const toast = useToast();
   const { onToggle } = useDisclosure();
-  const [isOn, setIsOn] = useState(false);
-  const toggleSwitch = () => setIsOn(!isOn);
 
   const {
     user,
@@ -89,27 +92,17 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();
     try {
-      const config = {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-        cancelToken: source.token,
-      };
       setLoading(true);
-      await axios
-        .get(
-          `https://zolachatapp-sever.onrender.com/api/message/${
-            selectedChat._id
-          }/${1}`,
-          config
-        )
-        .then((data) => setMessages(data.data));
+      await getMessagesPagination(selectedChat._id, 1).then((data) =>
+        setMessages(data.data)
+      );
       setLoading(false);
 
       if (user) socket.emit("join chat", selectedChat._id);
     } catch (error) {
-      if (axios.isCancel(error)) console.log("successfully aborted");
-      else
+      if (axios.isCancel(error)) {
+        console.log("successfully aborted");
+      } else
         toast({
           title: "Error Occured",
           description: "Failed to load message",
@@ -125,6 +118,7 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
     };
   };
   const inputRef = useRef(null);
+
   const selectImageChange = (event) => {
     const picture = event.target.files && event.target.files[0];
     if (!picture) {
@@ -132,20 +126,11 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
     }
     if (picture) {
       setLoadingPic(true);
-      const data = new FormData();
-      console.log(data);
-      data.append("file", picture);
-      data.append("upload_preset", "chat-chit");
-      data.append("cloud_name", "voluu");
-      fetch("https://api.cloudinary.com/v1_1/voluu/image/upload", {
-        method: "POST",
-        body: data,
-      })
+      sendMedia(picture, "image")
         .then((res) => res.json())
         .then((data) => {
           setPic(data.url.toString());
-          console.log("STRING");
-          console.log(data.url.toString());
+
           setLoadingPic(false);
         })
         .catch((err) => {
@@ -159,20 +144,10 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
       return;
     }
     if (video) {
-      const data = new FormData();
-      console.log(video);
-      data.append("file", video);
-      data.append("upload_preset", "chat-chit");
-      data.append("cloud_name", "voluu");
-      fetch("https://api.cloudinary.com/v1_1/voluu/video/upload", {
-        method: "POST",
-        body: data,
-      })
+      sendMedia(video, "video")
         .then((res) => res.json())
         .then((data) => {
           setVideo(data.url.toString());
-          console.log(data);
-          console.log(data.url.toString());
           setLoading(false);
         })
         .catch((err) => {
@@ -186,20 +161,11 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
       return;
     }
     if (file) {
-      const data = new FormData();
-      console.log(file);
-      data.append("file", file);
-      data.append("upload_preset", "chat-chit");
-      data.append("cloud_name", "voluu");
-      fetch("https://api.cloudinary.com/v1_1/voluu/raw/upload", {
-        method: "POST",
-        body: data,
-      })
+      sendMedia(file, "raw")
         .then((res) => res.json())
         .then((data) => {
           setFile(data.url.toString());
-          console.log(data);
-          console.log(data.url.toString());
+
           setLoading(false);
         })
         .catch((err) => {
@@ -216,37 +182,25 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
       inputRef.current.value = null;
       try {
         setLoadingNewMessage(true);
-        const config = {
-          headers: {
-            "Content-type": "application/json",
-            Authorization: `Bearer ${user.token}`,
-          },
-        };
+
         setNewMessage("");
-        await axios
-          .post(
-            "https://zolachatapp-sever.onrender.com/api/message",
-            {
-              multiMedia: pic,
-              multiFile: file,
-              multiVideo: video,
-              content: newMessage,
-              chatId: selectedChat._id,
-              response: response,
-            },
-            config
-          )
-          .then((data) => {
-            setPic("");
-            setVideo("");
-            setFile("");
-            setResponse(null);
-            socket.emit("new message", data.data);
-            console.log(data.data);
-            setMessages([...messages, data.data]);
-            setLoadingNewMessage(false);
-            setFetchAgain(!fetchAgain);
-          });
+        await sendNewMessage({
+          multiMedia: pic,
+          multiFile: file,
+          multiVideo: video,
+          content: newMessage,
+          chatId: selectedChat._id,
+          response: response,
+        }).then((data) => {
+          setPic("");
+          setVideo("");
+          setFile("");
+          setResponse(null);
+          socket.emit("new message", data.data);
+          setMessages([...messages, data.data]);
+          setLoadingNewMessage(false);
+          setFetchAgain(!fetchAgain);
+        });
       } catch (error) {
         toast({
           title: "Error Occured",
@@ -283,28 +237,16 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
     }, timerLength);
   };
   const callMess = () => {
-    const config = {
-      headers: {
-        "Content-type": "application/json",
-        Authorization: `Bearer ${user.token}`,
-      },
-    };
     setNewMessage("");
-    axios
-      .post(
-        "https://zolachatapp-sever.onrender.com/api/message",
-        {
-          content: "📞 A call was made by " + user.username,
-          chatId: selectedChat._id,
-        },
-        config
-      )
-      .then((data) => {
-        socket.emit("call", data.data);
-        setResponse(null);
-        setMessages([...messages, data.data]);
-        setFetchAgain(!fetchAgain);
-      });
+    sendNewMessage({
+      content: "📞 A call was made by " + user.username,
+      chatId: selectedChat._id,
+    }).then((data) => {
+      socket.emit("call", data.data);
+      setResponse(null);
+      setMessages([...messages, data.data]);
+      setFetchAgain(!fetchAgain);
+    });
   };
   useEffect(() => {
     socket = io(ENDPOINT);
@@ -322,14 +264,11 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
         onToggle();
       });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
     fetchMessages();
     selectedChatCompare = selectedChat;
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedChat]);
 
   useEffect(() => {
@@ -358,6 +297,7 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
         "toolbar=yes,scrollbars=yes,resizable=yes,top=50,left=70,width=1200,height=600"
       );
     });
+    return () => {};
   }, []);
 
   return (

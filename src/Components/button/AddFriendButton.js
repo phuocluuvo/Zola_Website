@@ -16,12 +16,16 @@ import {
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { IoPersonAdd } from "react-icons/io5";
-import { getSender, getSenderInfo, isExistInArray } from "../logic/ChatLogic";
-
+import { getUsersFriends, sendAddFriendRequest } from "../../apis/users.api";
+import {
+  getSender,
+  getSenderInfo,
+  isExistInArray,
+} from "../../logic/ChatLogic";
+// const ENDPOINT = process.env.REACT_APP_PORT;
 function AddFriendButton({ user, selectedChat, friend }) {
   const [friends, setFriends] = useState([]);
   const [isLoading, setIsLoading] = useBoolean(false);
-  const [isSendFriendRequest, setSendFriendRequest] = useBoolean(false);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const cancelRef = React.useRef();
   const toast = useToast();
@@ -34,22 +38,11 @@ function AddFriendButton({ user, selectedChat, friend }) {
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();
     try {
-      const config = {
-        headers: {
-          Authorization: `Bearer ${
-            JSON.parse(localStorage.getItem("userInfo")).token
-          }`,
-        },
-        cancelToken: source.token,
-      };
-      const { data } = await axios.get(
-        `https://zolachatapp-sever.onrender.com/api/friends`,
-        config
-      );
-      if (user) setFriends(data);
+      await getUsersFriends().then((res) => setFriends(res.data));
     } catch (error) {
-      if (axios.isCancel(error)) console.log("successfully aborted");
-      else {
+      if (axios.isCancel(error)) {
+        console.log("successfully aborted");
+      } else {
         console.log(error);
         toast({
           title: "Error Occured",
@@ -73,25 +66,14 @@ function AddFriendButton({ user, selectedChat, friend }) {
     setIsLoading.on();
 
     try {
-      const config = {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-        cancelToken: source.token,
-      };
-      await axios
-        .post(
-          `https://zolachatapp-sever.onrender.com/api/friendRequest/${friend._id}`,
-          { friendRequestId: friend._id },
-          config
-        )
-        .then((data) => {
-          setIsLoading.off();
-          onClose();
-        });
+      await sendAddFriendRequest(friend._id).then((data) => {
+        setIsLoading.off();
+        onClose();
+      });
     } catch (error) {
-      if (axios.isCancel(error)) console.log("successfully aborted");
-      else console.log(error);
+      if (axios.isCancel(error)) {
+        console.log("successfully aborted");
+      } else console.log(error);
 
       setIsLoading.off();
     } finally {

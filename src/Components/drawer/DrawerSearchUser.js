@@ -1,4 +1,3 @@
-import { SearchIcon } from "@chakra-ui/icons";
 import {
   Button,
   Drawer,
@@ -14,14 +13,14 @@ import {
   Box,
   Spinner,
   Text,
-  Spacer,
 } from "@chakra-ui/react";
 import React, { useState } from "react";
-import { ChatState } from "../providers/ChatProvider";
-import UserListItem from "./UserListItem";
+import { ChatState } from "../../providers/ChatProvider";
+import UserListItem from "../list/items/UserListItem";
 import axios from "axios";
-import ChatLoading from "./loading/ChatLoading";
-
+import ChatLoading from "../loading/ChatLoading";
+import { accessToChat, searchChats } from "../../apis/chats.api";
+// const ENDPOINT = process.env.REACT_APP_PORT;
 function DrawerSearchUser({ children }) {
   const { user, setSelectedChat, chats, setChats } = ChatState();
   const [search, setSearch] = useState("");
@@ -40,12 +39,7 @@ function DrawerSearchUser({ children }) {
           Authorization: `Bearer ${user.token}`,
         },
       };
-      const { data } = await axios.post(
-        `https://zolachatapp-sever.onrender.com/api/chat`,
-        { userId },
-        config
-      );
-
+      const { data } = await accessToChat(config, { userId });
       if (!chats.find((c) => c._id === data._id)) setChats([data, ...chats]);
 
       setSelectedChat(data);
@@ -75,15 +69,7 @@ function DrawerSearchUser({ children }) {
     }
     try {
       setLoading(true);
-      const config = {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      };
-      const { data } = await axios.get(
-        `https://zolachatapp-sever.onrender.com/api/user?search=${search}`,
-        config
-      );
+      const { data } = await searchChats(search);
       setLoading(false);
       setSearchResult(data);
     } catch (error) {

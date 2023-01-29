@@ -2,37 +2,26 @@ import { Avatar, Box, Button, Text, useBoolean } from "@chakra-ui/react";
 import axios from "axios";
 import moment from "moment";
 import React from "react";
-
+import { cancelSendRequest } from "../../../apis/friends.api";
+// const ENDPOINT = process.env.REACT_APP_PORT;
 function FriendRequestUserItem({ ufr, user }) {
   const [isLoading, setIsLoading] = useBoolean(false);
   const [isCancelSuccess, setCancelSuccess] = useBoolean(false);
 
-  const cancelRequest = async () => {
+  const cancellingRequestHandler = async () => {
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();
     setIsLoading.on();
     setCancelSuccess.off();
-
     try {
-      const config = {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-        cancelToken: source.token,
-      };
-      await axios
-        .post(
-          `https://zolachatapp-sever.onrender.com/api/friendRequest/deleteSended/${ufr.user[0]._id}`,
-          { friendRequestId: ufr.user[0]._id },
-          config
-        )
-        .then((data) => {
-          setIsLoading.off();
-          setCancelSuccess.off();
-        });
+      await cancelSendRequest(ufr.user[0]._id).then((data) => {
+        setIsLoading.off();
+        setCancelSuccess.off();
+      });
     } catch (error) {
-      if (axios.isCancel(error)) console.log("successfully aborted");
-      else console.log(error);
+      if (axios.isCancel(error)) {
+        console.log("successfully aborted");
+      } else console.log(error);
       setCancelSuccess.off();
     } finally {
       setIsLoading.off();
@@ -74,7 +63,7 @@ function FriendRequestUserItem({ ufr, user }) {
             <Text noOfLines={1}>{ufr?.user[0].fullname}</Text>
           </Box>
           <Button
-            onClick={cancelRequest}
+            onClick={cancellingRequestHandler}
             variant={isCancelSuccess ? "solid" : "outline"}
             colorScheme="red"
             isLoading={isLoading}

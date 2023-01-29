@@ -13,10 +13,10 @@ import {
 } from "@chakra-ui/react";
 import { AddIcon, ViewIcon } from "@chakra-ui/icons";
 import React, { useState } from "react";
-import ChatList from "./ChatsList";
+import ChatList from "./list/ChatsList";
 import { ChatState } from "../providers/ChatProvider";
 
-import GroupChatModal from "./GroupChatModal";
+import GroupChatModal from "./modal/GroupChatModal";
 
 function SideBar({ fetchAgain, setFetchAgain }) {
   const bg = useColorModeValue(
@@ -31,14 +31,12 @@ function SideBar({ fetchAgain, setFetchAgain }) {
   const {
     setCloseSideBar,
     user,
+    selectedChat,
     setSelectedChat,
-
     notification,
     setNotification,
   } = ChatState();
-  const { colorMode, toggleColorMode } = useColorMode();
-
-  const [isOn, setIsOn] = useState(false);
+  const { colorMode } = useColorMode();
 
   console.log("SideBar is rendered");
   return (
@@ -119,7 +117,9 @@ function SideBar({ fetchAgain, setFetchAgain }) {
                         onClick={() => {
                           setSelectedChat(notify.chat);
                           console.log(notify.chat);
-                          setNotification(notify.filter((n) => n !== notify));
+                          setNotification(
+                            notification.filter((n) => n !== notify)
+                          );
                         }}
                       >
                         {notify.chat.isGroupChat

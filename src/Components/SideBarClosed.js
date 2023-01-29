@@ -1,26 +1,17 @@
-import {
-  ArrowForwardIcon,
-  HamburgerIcon,
-  InfoIcon,
-  Search2Icon,
-  ViewOffIcon,
-} from "@chakra-ui/icons";
+import { ViewOffIcon } from "@chakra-ui/icons";
 import {
   Avatar,
   AvatarGroup,
   Box,
   Divider,
   IconButton,
-  Input,
   Menu,
   MenuButton,
   MenuItem,
   MenuList,
   Text,
   Tooltip,
-  useColorMode,
   useColorModeValue,
-  useDisclosure,
   useToast,
   VStack,
 } from "@chakra-ui/react";
@@ -28,10 +19,10 @@ import axios from "axios";
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { io } from "socket.io-client";
+import { getChats } from "../apis/chats.api";
 import { getSender, getSenderInfo } from "../logic/ChatLogic";
 import { ChatState } from "../providers/ChatProvider";
-import ProfileModal from "./ProfileModal";
-
+const ENDPOINT = process.env.REACT_APP_PORT;
 function SideBarClosed({ fetchAgain }) {
   const bg = useColorModeValue(
     "radial-gradient(circle, rgba(238,174,202,1) 0%, rgba(148,187,233,1) 100%)",
@@ -53,28 +44,17 @@ function SideBarClosed({ fetchAgain }) {
     setChats,
   } = ChatState();
   const toast = useToast();
-  const navigator = useNavigate();
 
   const fetchChats = async () => {
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();
     try {
-      const config = {
-        headers: {
-          Authorization: `Bearer ${
-            JSON.parse(localStorage.getItem("userInfo")).token
-          }`,
-        },
-        cancelToken: source.token,
-      };
-      const { data } = await axios.get(
-        `https://zolachatapp-sever.onrender.com/api/chat`,
-        config
-      );
+      const { data } = await getChats();
       if (user) setChats(data);
     } catch (error) {
-      if (axios.isCancel(error)) console.log("successfully aborted");
-      else {
+      if (axios.isCancel(error)) {
+        console.log("successfully aborted");
+      } else {
         console.log(error);
         toast({
           title: "Error Occured",
@@ -151,7 +131,7 @@ function SideBarClosed({ fetchAgain }) {
                   key={notify._id}
                   onClick={() => {
                     setSelectedChat(notify.chat);
-                    setNotification(notify.filter((n) => n !== notify));
+                    setNotification(notification.filter((n) => n !== notify));
                   }}
                 >
                   {notify.chat.isGroupChat
@@ -189,85 +169,79 @@ function SideBarClosed({ fetchAgain }) {
         h="fit-content"
       >
         {chats.map((chat, index) => (
-          <>
+          <Box
+            key={index}
+            display={"flex"}
+            width="100%"
+            justifyItems={"center"}
+            alignItems="center"
+            className="transition-colors "
+            bgColor={
+              selectedChat?._id !== chat?._id
+                ? ""
+                : colorMode === "light"
+                ? "white"
+                : "whiteAlpha.800"
+            }
+          >
             <Box
-              display={"flex"}
-              width="100%"
-              justifyItems={"center"}
-              alignItems="center"
-              className="transition-colors "
-              bgColor={
-                selectedChat?._id !== chat?._id
-                  ? ""
-                  : colorMode === "light"
-                  ? "white"
-                  : "whiteAlpha.800"
-              }
+              key={index}
+              className="transition-opacity pullRight"
+              onClick={() => {
+                selectedChat
+                  ? io(ENDPOINT).emit("outchat", selectedChat._id)
+                  : console.log("out out out");
+                setSelectedChat(chat);
+              }}
+              cursor="pointer"
+              position="relative"
+              display="flex"
+              alignItems={"center"}
+              justifyContent="space-between"
+              flex={1}
+              py="7px"
+              px="15px"
             >
-              <Box
-                key={index}
-                className="transition-opacity pullRight"
-                onClick={() => {
-                  selectedChat
-                    ? io("https://zolachatapp-sever.onrender.com").emit(
-                        "outchat",
-                        selectedChat._id
-                      )
-                    : console.log("out out out");
-                  setSelectedChat(chat);
-                }}
-                cursor="pointer"
-                position="relative"
-                display="flex"
-                alignItems={"center"}
-                justifyContent="space-between"
-                flex={1}
-                py="7px"
-                px="15px"
+              <Tooltip
+                label={
+                  chat.isGroupChat ? chat.chatName : getSender(user, chat.users)
+                }
+                hasArrow
+                placement="right-end"
               >
-                <Tooltip
-                  label={
-                    chat.isGroupChat
-                      ? chat.chatName
-                      : getSender(user, chat.users)
-                  }
-                  hasArrow
-                  placement="right-end"
-                >
-                  {chat.isGroupChat ? (
-                    <AvatarGroup
-                      size={"xs"}
-                      max={3}
-                      spacing={0}
-                      flexWrap={"wrap"}
-                      flexDirection="row-reverse"
-                      width="55px"
-                      py={0.5}
-                      pl={1}
-                    >
-                      {chat.users.map((u) => (
-                        <Avatar
-                          key={u._id}
-                          size={"md"}
-                          name={chat.chatName}
-                          src={u.pic}
-                        />
-                      ))}
-                    </AvatarGroup>
-                  ) : (
-                    <Avatar
-                      showBorder={true}
-                      width="55px"
-                      height="55px"
-                      size={"md"}
-                      name={user?._id && getSender(user, chat.users)}
-                      src={getSenderInfo(user, chat.users).pic}
-                    ></Avatar>
-                  )}
-                </Tooltip>
-              </Box>
+                {chat.isGroupChat ? (
+                  <AvatarGroup
+                    size={"xs"}
+                    max={3}
+                    spacing={0}
+                    flexWrap={"wrap"}
+                    flexDirection="row-reverse"
+                    width="55px"
+                    py={0.5}
+                    pl={1}
+                  >
+                    {chat.users.map((u) => (
+                      <Avatar
+                        key={u._id}
+                        size={"md"}
+                        name={chat.chatName}
+                        src={u.pic}
+                      />
+                    ))}
+                  </AvatarGroup>
+                ) : (
+                  <Avatar
+                    showBorder={true}
+                    width="55px"
+                    height="55px"
+                    size={"md"}
+                    name={user?._id && getSender(user, chat.users)}
+                    src={getSenderInfo(user, chat.users).pic}
+                  ></Avatar>
+                )}
+              </Tooltip>
             </Box>
-          </>
+          </Box>
         ))}
       </VStack>
     </Box>

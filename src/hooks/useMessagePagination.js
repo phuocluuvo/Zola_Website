@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-
+import { getMessagesPagination } from "../apis/messages.api";
+// const ENDPOINT = process.env.REACT_APP_PORT;
 export default function useMessagePagination(user, chat, pageNumber) {
   const [loadingMessage, setLoadingMessage] = useState(true);
   const [error, setError] = useState(false);
@@ -13,26 +14,19 @@ export default function useMessagePagination(user, chat, pageNumber) {
       const source = CancelToken.source();
 
       setError(false);
-
-      await axios
-        .get(
-          `https://zolachatapp-sever.onrender.com/api/message/${chat._id}/${pageNumber}`,
-          {
-            headers: {
-              "Content-type": "application/json",
-              Authorization: `Bearer ${user.token}`,
-            },
-            cancelToken: source.CancelToken,
-          }
-        )
+      await getMessagesPagination(chat._id, pageNumber)
         .then((res) => {
           setMessages([...new Set([...res.data, ...messages])]);
           setHasMore(res.data.length > 0);
           setLoadingMessage(false);
         })
         .catch((e) => {
-          if (axios.isCancel(e)) console.log("successfully aborted");
-          else setError(true);
+          if (axios.isCancel(e)) {
+            console.log("successfully aborted");
+          } else {
+            setError(true);
+            console.log(e);
+          }
         });
       return () => source.cancel();
     }

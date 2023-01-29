@@ -7,8 +7,6 @@ import {
   DrawerOverlay,
   DrawerContent,
   DrawerCloseButton,
-  Button,
-  Input,
   useDisclosure,
   Avatar,
   Box,
@@ -16,15 +14,15 @@ import {
   IconButton,
   useColorMode,
   useToast,
-  Image,
   Grid,
   GridItem,
 } from "@chakra-ui/react";
 import { InfoIcon } from "@chakra-ui/icons";
-import { ChatState } from "../providers/ChatProvider";
+import { ChatState } from "../../providers/ChatProvider";
 import axios from "axios";
-import { GalleryPhoto } from "./GalleryPhotoChat";
-
+import { GalleryPhoto } from "../GalleryPhotoChat";
+import { getMessages } from "../../apis/messages.api";
+//const ENDPOINT = process.env.REACT_APP_PORT;
 export default function DrawerInfoUser({ _user }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { colorMode } = useColorMode();
@@ -41,36 +39,26 @@ export default function DrawerInfoUser({ _user }) {
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();
     try {
-      const config = {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-        cancelToken: source.token,
-      };
       setLoading(true);
-      await axios
-        .get(
-          `https://zolachatapp-sever.onrender.com/api/message/${selectedChat._id}`,
-          config
-        )
-        .then((data) => {
-          for (const element of data.data.reverse()) {
-            if (element.multiMedia) {
-              setPics((pics) => [
-                ...pics,
-                {
-                  photo: element.multiMedia,
-                  caption: element.sender.username,
-                  subcaption: element.content,
-                },
-              ]);
-            }
+      await getMessages(selectedChat._id).then((data) => {
+        for (const element of data.data.reverse()) {
+          if (element.multiMedia) {
+            setPics((pics) => [
+              ...pics,
+              {
+                photo: element.multiMedia,
+                caption: element.sender.username,
+                subcaption: element.content,
+              },
+            ]);
           }
-        });
+        }
+      });
       setLoading(false);
     } catch (error) {
-      if (axios.isCancel(error)) console.log("successfully aborted");
-      else
+      if (axios.isCancel(error)) {
+        console.log("successfully aborted");
+      } else
         toast({
           title: "Error Occured",
           description: "Failed to load pic",

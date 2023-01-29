@@ -16,9 +16,9 @@ import {
   useColorModeValue,
   useDisclosure,
 } from "@chakra-ui/react";
-import ProfileModal from "./ProfileModal";
+import ProfileModal from "../modal/ProfileModal";
 import { useNavigate } from "react-router-dom";
-import { ChatState } from "../providers/ChatProvider";
+import { ChatState } from "../../providers/ChatProvider";
 function DrawerMenuUser() {
   const bg = useColorModeValue(
     "radial-gradient(circle, rgba(238,174,202,1) 0%, rgba(148,187,233,1) 100%)",

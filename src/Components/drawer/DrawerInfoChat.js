@@ -36,12 +36,17 @@ import {
   EditIcon,
   HamburgerIcon,
 } from "@chakra-ui/icons";
-import { ChatState } from "../providers/ChatProvider";
+import { ChatState } from "../../providers/ChatProvider";
 import axios from "axios";
-import UserListItem from "./UserListItem";
-import ListUsers from "./ListUsers";
+import UserListItem from "../list/items/UserListItem";
+import ListUsers from "../list/ListUsers";
 import { HiUserAdd, HiUserGroup } from "react-icons/hi";
-
+import {
+  addUserToChat,
+  removeUserFromChat,
+  renameChat,
+} from "../../apis/chats.api";
+const ENDPOINT = process.env.REACT_APP_PORT;
 export default function DrawerInfoChat({ fetchAgain, setFetchAgain }) {
   const { colorMode } = useColorMode();
   const btnRef = React.useRef();
@@ -92,20 +97,7 @@ export default function DrawerInfoChat({ fetchAgain, setFetchAgain }) {
     }
     try {
       setLoading(true);
-      const config = {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      };
-
-      const { data } = await axios.put(
-        `https://zolachatapp-sever.onrender.com/api/chat/groupremove`,
-        {
-          chatId: selectedChat._id,
-          userId: u._id,
-        },
-        config
-      );
+      const { data } = await removeUserFromChat(selectedChat._id, u._id);
       u._id === user._id ? setSelectedChat() : setSelectedChat(data);
       setFetchAgain(!fetchAgain);
       setLoading(false);
@@ -126,19 +118,8 @@ export default function DrawerInfoChat({ fetchAgain, setFetchAgain }) {
     if (!groupChatName) return;
     try {
       setRenameLoading(true);
-      const config = {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      };
-      const { data } = await axios.put(
-        "https://zolachatapp-sever.onrender.com/api/chat/rename",
-        {
-          chatId: selectedChat._id,
-          chatName: groupChatName,
-        },
-        config
-      );
+
+      const { data } = await renameChat(selectedChat._id, groupChatName);
       setSelectedChat(data);
       setFetchAgain(!fetchAgain);
       setRenameLoading(false);
@@ -167,7 +148,7 @@ export default function DrawerInfoChat({ fetchAgain, setFetchAgain }) {
       };
 
       const { data } = await axios.get(
-        `https://zolachatapp-sever.onrender.com/api/user?search=${search}`,
+        ENDPOINT + `/api/user?search=${search}`,
         config
       );
 
@@ -210,20 +191,8 @@ export default function DrawerInfoChat({ fetchAgain, setFetchAgain }) {
     }
     try {
       setLoading(true);
-      const config = {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      };
 
-      const { data } = await axios.put(
-        `https://zolachatapp-sever.onrender.com/api/chat/groupadd`,
-        {
-          chatId: selectedChat._id,
-          userId: u._id,
-        },
-        config
-      );
+      const { data } = await addUserToChat(selectedChat._id, u._id);
       setSelectedChat(data);
       setFetchAgain(!fetchAgain);
       setLoading(false);

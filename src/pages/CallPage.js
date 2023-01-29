@@ -9,7 +9,7 @@ import {
   BsFillCameraVideoOffFill,
 } from "react-icons/bs";
 import { ImPhoneHangUp } from "react-icons/im";
-
+const ENDPOINT = process.env.REACT_APP_PORT;
 export default function CallPage() {
   const { id, user } = useParams();
   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
@@ -18,11 +18,9 @@ export default function CallPage() {
   const [stateSound, setstateSound] = useState(true);
   const [localStream, setlocalStream] = useState();
   async function getInfo() {
-    await axios
-      .get(`https://zolachatapp-sever.onrender.com/api/user/${user}/id`)
-      .then((data) => {
-        setFriend(data.data);
-      });
+    await axios.get(ENDPOINT + `/api/user/${user}/id`).then((data) => {
+      setFriend(data.data);
+    });
   }
   useEffect(() => {
     getInfo();

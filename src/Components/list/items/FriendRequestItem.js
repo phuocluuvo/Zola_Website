@@ -9,38 +9,31 @@ import {
 import axios from "axios";
 import moment from "moment";
 import React from "react";
-
+import {
+  acceptFriendRequest,
+  denyFriendRequest,
+} from "../../../apis/friends.api";
+// const ENDPOINT = process.env.REACT_APP_PORT;
 function FriendRequestItem({ friendRequest, user }) {
   const [isLoading, setIsLoading] = useBoolean(false);
   const [isAcceptedSuccess, setAcceptedSuccess] = useBoolean(false);
   const [isDeniedSuccess, setDeniedSuccess] = useBoolean(false);
 
-  const acceptFriendRequest = async () => {
+  const handlerAcceptRequest = async () => {
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();
     setIsLoading.on();
     setAcceptedSuccess.off();
 
     try {
-      const config = {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-        cancelToken: source.token,
-      };
-      await axios
-        .post(
-          `https://zolachatapp-sever.onrender.com/api/friendRequest/accept/${friendRequest.user[0]._id}`,
-          { friendRequestId: friendRequest.user[0]._id },
-          config
-        )
-        .then((data) => {
-          setIsLoading.off();
-          setAcceptedSuccess.off();
-        });
+      await acceptFriendRequest(friendRequest.user[0]._id).then((res) => {
+        setIsLoading.off();
+        setAcceptedSuccess.off();
+      });
     } catch (error) {
-      if (axios.isCancel(error)) console.log("successfully aborted");
-      else console.log(error);
+      if (axios.isCancel(error)) {
+        console.log("successfully aborted");
+      } else console.log(error);
       setAcceptedSuccess.off();
     } finally {
       setIsLoading.off();
@@ -50,32 +43,21 @@ function FriendRequestItem({ friendRequest, user }) {
       source.cancel();
     };
   };
-  const denyFriendRequest = async () => {
+  const denyFriendRequestHandler = async () => {
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();
     setIsLoading.on();
     setDeniedSuccess.off();
 
     try {
-      const config = {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-        cancelToken: source.token,
-      };
-      await axios
-        .post(
-          `https://zolachatapp-sever.onrender.com/api/friendRequest/denied/${friendRequest.user[0]._id}`,
-          { friendRequestId: friendRequest.user[0]._id },
-          config
-        )
-        .then((data) => {
-          setIsLoading.off();
-          setDeniedSuccess.off();
-        });
+      await denyFriendRequest(friendRequest.user[0]._id).then((data) => {
+        setIsLoading.off();
+        setDeniedSuccess.off();
+      });
     } catch (error) {
-      if (axios.isCancel(error)) console.log("successfully aborted");
-      else console.log(error);
+      if (axios.isCancel(error)) {
+        console.log("successfully aborted");
+      } else console.log(error);
       setDeniedSuccess.off();
     } finally {
       setIsLoading.off();
@@ -115,7 +97,7 @@ function FriendRequestItem({ friendRequest, user }) {
           isLoading={isLoading}
           variant={isAcceptedSuccess ? "solid" : "outline"}
           colorScheme={isAcceptedSuccess ? "green" : "blue"}
-          onClick={acceptFriendRequest}
+          onClick={handlerAcceptRequest}
         >
           {isAcceptedSuccess ? <>Accepted ✓</> : "Accept"}
         </Button>
@@ -124,7 +106,7 @@ function FriendRequestItem({ friendRequest, user }) {
           variant={isDeniedSuccess ? "solid" : "outline"}
           colorScheme={"red"}
           textColor="red"
-          onClick={denyFriendRequest}
+          onClick={denyFriendRequestHandler}
         >
           {isDeniedSuccess ? <>Denied ✕</> : "Deny"}
         </Button>

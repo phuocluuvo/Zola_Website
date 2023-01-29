@@ -4,7 +4,7 @@ import axios from "axios";
 import gsap from "gsap";
 import { useIsPresent } from "framer-motion";
 import { useParams, useNavigate } from "react-router-dom";
-const link = "https://zolachatapp-sever.onrender.com";
+const ENDPOINT = process.env.REACT_APP_PORT;
 function ForgotPage({ setShow }) {
   const [password, setPassword] = useState("");
   const [confirmpassword, setConfirmPassword] = useState("");
@@ -13,7 +13,7 @@ function ForgotPage({ setShow }) {
   let navigate = useNavigate();
   const handleSubmit = async () => {
     const data = await axios.post(
-      `${link}}/api/user/forgot-password/${id}/reset`,
+      `${ENDPOINT}}/api/user/forgot-password/${id}/reset`,
       {
         password: password,
       }

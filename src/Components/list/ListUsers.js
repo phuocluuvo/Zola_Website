@@ -1,20 +1,18 @@
 import {
   Avatar,
-  AvatarBadge,
   Badge,
   Box,
   Spinner,
   Text,
-  useColorMode,
   useColorModeValue,
   useToast,
 } from "@chakra-ui/react";
-import axios from "axios";
 import React, { useState } from "react";
-import { ChatState } from "../providers/ChatProvider";
-import ProfileModal from "./ProfileModal";
-import UserBadgeItem from "./UserBadgeItem";
-
+import { removeUserFromChat } from "../../apis/chats.api";
+import { ChatState } from "../../providers/ChatProvider";
+import ProfileModal from "../modal/ProfileModal";
+import UserBadgeItem from "./items/UserBadgeItem";
+// const ENDPOINT = process.env.REACT_APP_PORT;
 export default function ListUsers({ fetchAgain, setFetchAgain }) {
   const [loading, setLoading] = useState(false);
   const { user, selectedChat, setSelectedChat } = ChatState();
@@ -37,21 +35,9 @@ export default function ListUsers({ fetchAgain, setFetchAgain }) {
     }
     try {
       setLoading(true);
-      const config = {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      };
-
-      const { data } = await axios.put(
-        `https://zolachatapp-sever.onrender.com/api/chat/groupremove`,
-        {
-          chatId: selectedChat._id,
-          userId: u._id,
-        },
-        config
-      );
+      const { data } = await removeUserFromChat(selectedChat._id, u._id);
       u._id === user._id ? setSelectedChat() : setSelectedChat(data);
+
       setFetchAgain(!fetchAgain);
       setLoading(false);
     } catch (error) {

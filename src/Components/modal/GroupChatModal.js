@@ -17,9 +17,11 @@ import {
 } from "@chakra-ui/react";
 import axios from "axios";
 import React, { memo, useState } from "react";
-import { ChatState } from "../providers/ChatProvider";
-import UserListItem from "./UserListItem";
-
+import { createChat } from "../../apis/chats.api";
+import { searchUser } from "../../apis/users.api";
+import { ChatState } from "../../providers/ChatProvider";
+import UserListItem from "../list/items/UserListItem";
+// const ENDPOINT = process.env.REACT_APP_PORT;
 function GroupChatModal({ children }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [groupChatName, setGroupChatName] = useState("");
@@ -45,16 +47,14 @@ function GroupChatModal({ children }) {
         cancelToken: source.token,
       };
 
-      const { data } = await axios.get(
-        `https://zolachatapp-sever.onrender.com/api/user?search=${search}`,
-        config
-      );
+      const { data } = await searchUser(config, search);
       console.log(data);
       setSearchResult(data);
       setLoading(false);
     } catch (error) {
-      if (axios.isCancel(error)) console.log("successfully aborted");
-      else
+      if (axios.isCancel(error)) {
+        console.log("successfully aborted");
+      } else {
         toast({
           title: "Error Occured",
           description: "Failed to load search results",
@@ -63,6 +63,7 @@ function GroupChatModal({ children }) {
           isClosable: true,
           position: "bottom-left",
         });
+      }
     }
     return () => {
       source.cancel();
@@ -87,14 +88,18 @@ function GroupChatModal({ children }) {
         },
       };
 
-      const { data } = await axios.post(
-        `https://zolachatapp-sever.onrender.com/api/chat/group`,
-        {
-          name: groupChatName,
-          users: JSON.stringify(selectedUsers.map((u) => u._id)),
-        },
-        config
-      );
+      const { data } = await createChat(config, {
+        name: groupChatName,
+        users: JSON.stringify(selectedUsers.map((u) => u._id)),
+      });
+      //   await axios.post(
+      //   ENDPOINT + `/api/chat/group`,
+      //   {
+      //     name: groupChatName,
+      //     users: JSON.stringify(selectedUsers.map((u) => u._id)),
+      //   },
+      //   config
+      // );
       setChats([data, ...chats]);
       onClose();
       toast({

@@ -15,6 +15,8 @@ import UserListItem from "./UserListItem";
 import { ChatState } from "../providers/ChatProvider";
 import axios from "axios";
 import { RiEmotionSadFill } from "react-icons/ri";
+import { getFriends } from "../apis/friends.api";
+const ENDPOINT = process.env.REACT_APP_PORT;
 function SideBarFriendsZone({
   display,
   setIsDisplay,
@@ -37,15 +39,7 @@ function SideBarFriendsZone({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [display]);
   const fetchFriends = async () => {
-    const config = {
-      headers: {
-        Authorization: `Bearer ${user.token}`,
-      },
-    };
-    const { data } = await axios.get(
-      `https://zolachatapp-sever.onrender.com/api/friends`,
-      config
-    );
+    const { data } = await getFriends();
     setFriends(data);
   };
 
@@ -59,7 +53,7 @@ function SideBarFriendsZone({
         },
       };
       const { data } = await axios.post(
-        `https://zolachatapp-sever.onrender.com/api/chat`,
+        ENDPOINT + `/api/chat`,
         { userId },
         config
       );

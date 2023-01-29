@@ -21,13 +21,19 @@ import { IoMdListBox } from "react-icons/io";
 import { FaUserFriends, FaUserPlus } from "react-icons/fa";
 
 import React, { useEffect, useState } from "react";
-import FriendRequestItem from "./FriendRequestItem";
-import FriendRequestUserItem from "./FriendRequestUserItem";
+import FriendRequestItem from "./list/items/FriendRequestItem";
+import FriendRequestUserItem from "./list/items/FriendRequestUserItem";
 import { ChatState } from "../providers/ChatProvider";
 import { RiEmotionSadFill } from "react-icons/ri";
 
-import FriendListItem from "./FriendListItem";
-
+import FriendListItem from "./list/items/FriendListItem";
+import {
+  getFriendRequest,
+  getFriends,
+  getUserFriendRequests,
+} from "../apis/friends.api";
+import { accessToChat } from "../apis/chats.api";
+// const ENDPOINT = process.env.REACT_APP_PORT;
 function FriendsZone({ display, user, setIsDisplay }) {
   const [friendRequests, setFriendsRequests] = useState([]);
   const [userFriendRequests, setUserFriendsRequests] = useState([]);
@@ -42,31 +48,13 @@ function FriendsZone({ display, user, setIsDisplay }) {
   const toast = useToast();
 
   const fetchFriends = async () => {
-    const config = {
-      headers: {
-        Authorization: `Bearer ${user.token}`,
-      },
-    };
-    const { data } = await axios.get(
-      `https://zolachatapp-sever.onrender.com/api/friends`,
-      config
-    );
+    const { data } = await getFriends();
     setFriends(data);
   };
   const accessChat = async (userId) => {
     try {
       setLoadingChat(true);
-      const config = {
-        headers: {
-          "Content-type": "application/json",
-          Authorization: `Bearer ${user.token}`,
-        },
-      };
-      const { data } = await axios.post(
-        `https://zolachatapp-sever.onrender.com/api/chat`,
-        { userId },
-        config
-      );
+      const { data } = await accessToChat({ userId });
 
       if (!chats.find((c) => c._id === data._id)) setChats([data, ...chats]);
 
@@ -92,24 +80,14 @@ function FriendsZone({ display, user, setIsDisplay }) {
     const source = CancelToken.source();
     setIsLoadingUserRequestedList.on();
     try {
-      const config = {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-        cancelToken: source.token,
-      };
-      await axios
-        .get(
-          `https://zolachatapp-sever.onrender.com/api/friendRequest/sended`,
-          config
-        )
-        .then((data) => {
-          setUserFriendsRequests(data.data);
-          setIsLoadingUserRequestedList.off();
-        });
+      await getUserFriendRequests().then((data) => {
+        setUserFriendsRequests(data.data);
+        setIsLoadingUserRequestedList.off();
+      });
     } catch (error) {
-      if (axios.isCancel(error)) console.log("successfully aborted");
-      else console.log(error);
+      if (axios.isCancel(error)) {
+        console.log("successfully aborted");
+      } else console.log(error);
     } finally {
       setIsLoadingUserRequestedList.off();
     }
@@ -131,18 +109,14 @@ function FriendsZone({ display, user, setIsDisplay }) {
         },
         cancelToken: source.token,
       };
-      await axios
-        .get(
-          `https://zolachatapp-sever.onrender.com/api/friendRequest/request`,
-          config
-        )
-        .then((data) => {
-          setFriendsRequests(data.data);
-          setIsLoading.off();
-        });
+      await getFriendRequest(config).then((data) => {
+        setFriendsRequests(data.data);
+        setIsLoading.off();
+      });
     } catch (error) {
-      if (axios.isCancel(error)) console.log("successfully aborted");
-      else console.log(error);
+      if (axios.isCancel(error)) {
+        console.log("successfully aborted");
+      } else console.log(error);
       setIsLoading.off();
     }
     return () => {
@@ -154,6 +128,8 @@ function FriendsZone({ display, user, setIsDisplay }) {
     fetchFriendRequests();
     fetchUserFriendRequests();
     fetchFriends();
+    return () => {};
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [display]);
   return (

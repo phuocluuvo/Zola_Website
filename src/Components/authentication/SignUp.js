@@ -30,6 +30,8 @@ import { AtSignIcon, EmailIcon } from "@chakra-ui/icons";
 import { HiCheck } from "react-icons/hi";
 import { MdPassword } from "react-icons/md";
 import { RiErrorWarningLine } from "react-icons/ri";
+import { sendMedia } from "../../apis/messages.api";
+const ENDPOINT = process.env.REACT_APP_PORT;
 function SignUp({ setShow }) {
   const [fullname, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -59,14 +61,7 @@ function SignUp({ setShow }) {
       return;
     }
     if (pics.type === "image/jpeg" || pics.type === "image/png") {
-      const data = new FormData();
-      data.append("file", pics);
-      data.append("upload_preset", "chat-chit");
-      data.append("cloud_name", "voluu");
-      fetch("https://api.cloudinary.com/v1_1/voluu/image/upload", {
-        method: "POST",
-        body: data,
-      })
+      sendMedia(pics, "image")
         .then((res) => res.json())
         .then((data) => {
           setPic(data.url.toString());
@@ -123,7 +118,7 @@ function SignUp({ setShow }) {
         };
 
         const { data } = await axios.post(
-          "https://zolachatapp-sever.onrender.com/api/user",
+          ENDPOINT + "/api/user",
           { username, fullname, email, password, pic },
           config
         );
@@ -162,7 +157,7 @@ function SignUp({ setShow }) {
 
     await axios
       .post(
-        "https://zolachatapp-sever.onrender.com/api/user/:email",
+        ENDPOINT + "/api/user/:email",
         {
           email: email,
         },
@@ -170,7 +165,7 @@ function SignUp({ setShow }) {
       )
       .then((data) => {
         axios
-          .post("https://zolachatapp-sever.onrender.com/api/user/verify", {
+          .post(ENDPOINT + "/api/user/verify", {
             userId: data.data._id,
             otp: OTP.otp,
           })
@@ -212,7 +207,7 @@ function SignUp({ setShow }) {
       };
       await axios
         .post(
-          "https://zolachatapp-sever.onrender.com/api/user/checkemail/:email",
+          ENDPOINT + "/api/user/checkemail/:email",
           { email: query },
           config
         )
@@ -221,7 +216,9 @@ function SignUp({ setShow }) {
           else setEmailExist(false);
         });
     } catch (error) {
-      if (axios.isCancel(error)) console.log("successfully aborted");
+      if (axios.isCancel(error)) {
+        console.log("successfully aborted");
+      }
     }
 
     return () => {
@@ -251,7 +248,7 @@ function SignUp({ setShow }) {
         };
         await axios
           .post(
-            "https://zolachatapp-sever.onrender.com/api/user/checkusername/:username",
+            ENDPOINT + "/api/user/checkusername/:username",
             { username: username },
             config
           )
@@ -261,7 +258,9 @@ function SignUp({ setShow }) {
             else setUsernameExist(false);
           });
       } catch (error) {
-        if (axios.isCancel(error)) console.log("successfully aborted");
+        if (axios.isCancel(error)) {
+          console.log("successfully aborted");
+        }
       }
     else {
       setUsernameExist(true);

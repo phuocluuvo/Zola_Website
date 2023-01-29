@@ -19,9 +19,15 @@ import {
 } from "@chakra-ui/react";
 import axios from "axios";
 import React, { useState } from "react";
-import { ChatState } from "../providers/ChatProvider";
-import UserBadgeItem from "./UserBadgeItem";
-import UserListItem from "./UserListItem";
+import {
+  removeUserFromChat,
+  renameChat,
+  searchChats,
+} from "../../apis/chats.api";
+import { ChatState } from "../../providers/ChatProvider";
+import UserBadgeItem from "../list/items/UserBadgeItem";
+import UserListItem from "../list/items/UserListItem";
+const ENDPOINT = process.env.REACT_APP_PORT;
 function UpdateGroupChatModal({
   fetchAgain,
   setFetchAgain,
@@ -50,20 +56,8 @@ function UpdateGroupChatModal({
     }
     try {
       setLoading(true);
-      const config = {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      };
 
-      const { data } = await axios.put(
-        `https://zolachatapp-sever.onrender.com/api/chat/groupremove`,
-        {
-          chatId: selectedChat._id,
-          userId: u._id,
-        },
-        config
-      );
+      const { data } = await removeUserFromChat(selectedChat._id, u._id);
       u._id === user._id ? setSelectedChat() : setSelectedChat(data);
       setFetchAgain(!fetchAgain);
       fetchMessages();
@@ -85,19 +79,7 @@ function UpdateGroupChatModal({
     if (!groupChatName) return;
     try {
       setRenameLoading(true);
-      const config = {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      };
-      const { data } = await axios.put(
-        "api/chat/rename",
-        {
-          chatId: selectedChat._id,
-          chatName: groupChatName,
-        },
-        config
-      );
+      const { data } = await renameChat(selectedChat._id, groupChatName);
       setSelectedChat(data);
       setFetchAgain(!fetchAgain);
       setRenameLoading(false);
@@ -119,17 +101,7 @@ function UpdateGroupChatModal({
     if (!query) return;
     try {
       setLoading(true);
-      const config = {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      };
-
-      const { data } = await axios.get(
-        `https://zolachatapp-sever.onrender.com/api/user?search=${search}`,
-        config
-      );
-
+      const { data } = await searchChats(search);
       setSearchResult(data);
       setLoading(false);
     } catch (error) {
@@ -176,7 +148,7 @@ function UpdateGroupChatModal({
       };
 
       const { data } = await axios.put(
-        `https://zolachatapp-sever.onrender.com/api/chat/groupadd`,
+        ENDPOINT + `/api/chat/groupadd`,
         {
           chatId: selectedChat._id,
           userId: u._id,

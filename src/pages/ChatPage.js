@@ -1,13 +1,13 @@
 import React, { useState } from "react";
 import { Box } from "@chakra-ui/react";
-import SideBar from "../Components/SideBar";
-import ChatZone from "../Components/ChatZone";
-import SideBarClosed from "../Components/SideBarClosed";
 import { ChatState } from "../providers/ChatProvider";
 import { motion, useIsPresent } from "framer-motion";
 import { ErrorBoundary } from "../errors/ErrorBoundary";
 import NavigationSideBar from "./NavigationSideBar";
 import FriendsZone from "../Components/FriendsZone";
+import ChatZone from "../Components/ChatZone";
+import SideBar from "../Components/SideBar";
+import SideBarClosed from "../Components/SideBarClosed";
 
 function ChatPage() {
   const { closeSideBar, selectedChat, user } = ChatState();

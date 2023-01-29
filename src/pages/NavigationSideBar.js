@@ -28,8 +28,8 @@ import React, { useState } from "react";
 import { ChatState } from "../providers/ChatProvider";
 import { motion, useAnimation } from "framer-motion";
 import { MdOutlineFeaturedPlayList } from "react-icons/md";
-import ProfileModal from "../Components/ProfileModal";
-import DrawerSearchUser from "../Components/DrawerSearchUser";
+import ProfileModal from "../Components/modal/ProfileModal";
+import DrawerSearchUser from "../Components/drawer/DrawerSearchUser";
 export default function NavigationSideBar({ display, setIsDisplay }) {
   const { user } = ChatState();
   const toggleSwitch = () => setIsOn(!isOn);

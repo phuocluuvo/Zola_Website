@@ -24,7 +24,9 @@ import axios from "axios";
 import React from "react";
 import { FaUserTimes } from "react-icons/fa";
 import { HiOutlineDotsVertical } from "react-icons/hi";
-import ProfileModal from "./ProfileModal";
+import { unfriend } from "../../../apis/friends.api";
+import ProfileModal from "../../modal/ProfileModal";
+// const ENDPOINT = process.env.REACT_APP_PORT;
 function FriendListItem({ user, handleFunction }) {
   const [isLoading, setIsLoading] = useBoolean(false);
 
@@ -39,26 +41,15 @@ function FriendListItem({ user, handleFunction }) {
     setDeniedSuccess.off();
 
     try {
-      const config = {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-        cancelToken: source.token,
-      };
-      await axios
-        .post(
-          `https://zolachatapp-sever.onrender.com/api/friends/deletefriend/${user._id}`,
-          { friendRequestId: user._id },
-          config
-        )
-        .then(() => {
-          setIsLoading.off();
-          setDeniedSuccess.off();
-          onClose();
-        });
+      await unfriend(user._id).then(() => {
+        setIsLoading.off();
+        setDeniedSuccess.off();
+        onClose();
+      });
     } catch (error) {
-      if (axios.isCancel(error)) console.log("successfully aborted");
-      else console.log(error);
+      if (axios.isCancel(error)) {
+        console.log("successfully aborted");
+      } else console.log(error);
       setDeniedSuccess.off();
     } finally {
       setIsLoading.off();
@@ -125,6 +116,7 @@ function FriendListItem({ user, handleFunction }) {
           ></IconButton>
         </Tooltip>
       </Box>
+      {/* <UnfriendDialog isOpen={isOpen} onClose={onClose} cancelRef={cancelRef} username={user?.username} onClick={unfriendHandler}/>*/}
       <AlertDialog
         isOpen={isOpen}
         leastDestructiveRef={cancelRef}

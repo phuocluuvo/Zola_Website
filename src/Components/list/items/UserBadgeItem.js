@@ -9,20 +9,14 @@ import {
   useColorModeValue,
   useDisclosure,
   useToast,
-  AlertDialog,
-  AlertDialogBody,
-  AlertDialogContent,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogOverlay,
-  Button,
-  AlertDialogCloseButton,
   Badge,
 } from "@chakra-ui/react";
 import axios from "axios";
 import React from "react";
-import { ChatState } from "../providers/ChatProvider";
-import ProfileModal from "./ProfileModal";
+import { changeAdmin } from "../../../apis/chats.api";
+import { ChatState } from "../../../providers/ChatProvider";
+import ChangeAdminDialog from "../../dialog/ChangeAdminDialog";
+import ProfileModal from "../../modal/ProfileModal";
 
 function UserBadgeItem({
   _user,
@@ -32,7 +26,7 @@ function UserBadgeItem({
   fetchAgain,
 }) {
   console.log("UserBadgeItem is rendered");
-  const { colorMode, toggleColorMode } = useColorMode();
+  const { colorMode } = useColorMode();
   const bgColor = useColorModeValue(
     "radial-gradient( circle farthest-corner at 10% 20%,  rgba(255,229,168,1) 0%, rgba(251,174,222,1) 100.7% )",
     "radial-gradient( circle 610px at 5.2% 51.6%,  rgba(5,8,114,1) 0%, rgba(7,3,53,1) 97.5% )"
@@ -43,26 +37,12 @@ function UserBadgeItem({
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();
     try {
-      const config = {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-        cancelToken: source.token,
-      };
-      await axios
-        .put(
-          `https://zolachatapp-sever.onrender.com/chat/changeAdmin`,
-          {
-            chatId: selectedChat._id,
-            userId: _user._id,
-          },
-          config
-        )
-        .then((data) => data.data);
+      await changeAdmin(selectedChat._id, _user._id).then((data) => data.data);
       setFetchAgain(!fetchAgain);
     } catch (error) {
-      if (axios.isCancel(error)) console.log("successfully aborted");
-      else
+      if (axios.isCancel(error)) {
+        console.log("successfully aborted");
+      } else
         toast({
           title: "Error Occured",
           description: "Failed to promote" + error.message,
@@ -156,34 +136,13 @@ function UserBadgeItem({
         ) : null}
       </Box>
       {isAdmin ? (
-        <AlertDialog
-          motionPreset="slideInBottom"
-          leastDestructiveRef={cancelRef}
-          onClose={onClose}
+        <ChangeAdminDialog
+          cancelRef={cancelRef}
+          changeAdmin={handleChangeAdmin}
           isOpen={isOpen}
-          isCentered
-        >
-          <AlertDialogOverlay />
-
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              Promte @{_user?.username} to Group Admin?
-            </AlertDialogHeader>
-            <AlertDialogCloseButton />
-            <AlertDialogBody>
-              Are you sure you want to discard all of your notes? 44 words will
-              be deleted.
-            </AlertDialogBody>
-            <AlertDialogFooter>
-              <Button ref={cancelRef} onClick={onClose}>
-                No
-              </Button>
-              <Button colorScheme="yellow" ml={3} onClick={handleChangeAdmin}>
-                Yes
-              </Button>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
+          onClose={onClose}
+          username={_user?.username}
+        />
       ) : null}
     </>
   ) : null;

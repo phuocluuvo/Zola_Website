@@ -34,7 +34,7 @@ import {
   addDoc,
 } from "firebase/firestore";
 import { EmailIcon } from "@chakra-ui/icons";
-
+const ENDPOINT = process.env.REACT_APP_PORT;
 const firebaseConfig = {
   apiKey: process.env.REACT_APP_API_KEY,
   authDomain: "authen-server-zola.firebaseapp.com",
@@ -84,7 +84,7 @@ function SignIn({ setShow, isOpen }) {
 
       const use = await axios
         .post(
-          "https://zolachatapp-sever.onrender.com/api/user/:email",
+          ENDPOINT + "/api/user/:email",
           {
             email: user.email,
           },
@@ -94,7 +94,7 @@ function SignIn({ setShow, isOpen }) {
 
       if (use.data === "a") {
         const { data } = await axios.post(
-          "https://zolachatapp-sever.onrender.com/api/user",
+          ENDPOINT + "/api/user",
           {
             username: user.displayName,
             fullname: user.displayName,
@@ -117,7 +117,7 @@ function SignIn({ setShow, isOpen }) {
         });
       } else if (use) {
         const { data } = await axios.post(
-          "https://zolachatapp-sever.onrender.com/api/user/login",
+          ENDPOINT + "/api/user/login",
           {
             email: user.email,
             password: user.uid,
@@ -190,12 +190,12 @@ function SignIn({ setShow, isOpen }) {
       };
 
       const { data } = await axios.post(
-        "https://zolachatapp-sever.onrender.com/api/user/login",
+        ENDPOINT + "/api/user/login",
         { email, password },
         config
       );
       const verify = await axios.post(
-        "https://zolachatapp-sever.onrender.com/api/user/:email",
+        ENDPOINT + "/api/user/:email",
         {
           email: email,
         },

@@ -2,7 +2,7 @@ import { Box, Spinner, Text } from "@chakra-ui/react";
 import React, { useCallback, useRef } from "react";
 import ScrollableFeed from "react-scrollable-feed";
 
-import MessageItem from "./MessageItem";
+import MessageItem from "../list/items/MessageItem";
 
 function MessageList({
   loadingMessage,
@@ -29,7 +29,13 @@ function MessageList({
   return (
     <ScrollableFeed className="pt-16 px-4 w-full scrollbar-thin scroll-smooth scrollbar-thumb-slate-600">
       {loadingMessage ? (
-        <Box w={"full"} textAlign="center" display="flex">
+        <Box
+          w={"full"}
+          textAlign="center"
+          justifyContent={"center"}
+          alignItems="center"
+          display="flex"
+        >
           <Text>Loading...</Text>
           <Spinner size={"sm"}></Spinner>
         </Box>

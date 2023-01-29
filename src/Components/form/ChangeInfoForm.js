@@ -20,10 +20,13 @@ import {
 } from "@chakra-ui/react";
 import React, { useState } from "react";
 import { Field, Form, Formik } from "formik";
-import { ChatState } from "../providers/ChatProvider";
 import axios from "axios";
-
 import { AiFillEdit } from "react-icons/ai";
+import { ChatState } from "../../providers/ChatProvider";
+import { sendMedia } from "../../apis/messages.api";
+import { updateUserInfomation } from "../../apis/users.api";
+
+// const ENDPOINT = process.env.REACT_APP_PORT;
 function ChangeInfoForm({ userUpdate }) {
   const toast = useToast();
 
@@ -41,14 +44,7 @@ function ChangeInfoForm({ userUpdate }) {
       return;
     }
     if (pics.type === "image/jpeg" || pics.type === "image/png") {
-      const data = new FormData();
-      data.append("file", pics);
-      data.append("upload_preset", "chat-chit");
-      data.append("cloud_name", "voluu");
-      fetch("https://api.cloudinary.com/v1_1/voluu/image/upload", {
-        method: "POST",
-        body: data,
-      })
+      sendMedia(pics, "image")
         .then((res) => res.json())
         .then((data) => {
           setPic(data.url.toString());
@@ -74,29 +70,16 @@ function ChangeInfoForm({ userUpdate }) {
       pic: pic,
     });
     try {
-      const config = {
-        headers: {
-          "Content-type": "application/json",
-          Authorization: `Bearer ${user.token}`,
-        },
-      };
-
-      await axios
-        .put(
-          "https://zolachatapp-sever.onrender.com/api/user/update/",
-          {
-            _id: values._id,
-            fullname: values.fullname,
-            username: values.username,
-            pic: pic,
-          },
-          config
-        )
-        .then((res) => {
-          setUser(res.data);
-          localStorage.setItem("userInfo", JSON.stringify(res.data));
-          console.log(res.data);
-        });
+      await updateUserInfomation({
+        _id: values._id,
+        fullname: values.fullname,
+        username: values.username,
+        pic: pic,
+      }).then((res) => {
+        setUser(res.data);
+        localStorage.setItem("userInfo", JSON.stringify(res.data));
+        console.log(res.data);
+      });
     } catch (e) {
       toast({
         title: "Error Occured",
@@ -125,22 +108,24 @@ function ChangeInfoForm({ userUpdate }) {
           },
           cancelToken: source.token,
         };
-        await axios
-          .post(
-            "https://zolachatapp-sever.onrender.com/api/user/checkusername/:username",
-            { username: value },
-            config
-          )
-          .then((data) => {
-            console.log(data.data.username);
-            if (data.data.username) error = "Username already exist";
-          });
+        // await axios
+        //   .post(
+        //     ENDPOINT + "/api/user/checkusername/:username",
+        //     { username: value },
+        //     config
+        //   )
+        //   .then((data) => {
+        //     console.log(data.data.username);
+        //     if (data.data.username) error = "Username already exist";
+        //   });
       } catch (error) {
-        if (axios.isCancel(error)) console.log("successfully aborted");
+        if (axios.isCancel(error)) {
+          console.log("successfully aborted");
+        }
       }
     else
       error =
-        "Username is contain 5-18 characters and not include special characters";
+        "Password is contain 5-18 characters and not include special characters";
     return error;
   }
   function validateFullName(value) {
