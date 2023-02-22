@@ -170,6 +170,7 @@ function SignIn({ setShow, isOpen }) {
   };
   const submitHandler = async () => {
     setLoading(true);
+
     if (!email || !password) {
       toast({
         title: "Please fill all fields",
@@ -209,11 +210,14 @@ function SignIn({ setShow, isOpen }) {
           isClosable: true,
           position: "bottom",
         });
-        localStorage.setItem("userInfo", JSON.stringify(data));
-        const userInfo = JSON.parse(localStorage.getItem("userInfo"));
-        setLoading(false);
-        setUser(userInfo);
-        navigate("/chats");
+        if (data) {
+          localStorage.setItem("userInfo", JSON.stringify(data));
+          const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+          setLoading(false);
+          setUser(userInfo);
+          if(userInfo.token)
+          setTimeout(() => navigate("/chats"), 10);
+        }
       }
       if (verify.data.verify === false) {
         setLoading(false);
@@ -322,7 +326,7 @@ function SignIn({ setShow, isOpen }) {
         >
           forgot password, eh? Press here, bro.
         </Button>
-        <Box zIndex={10}>
+        <VStack zIndex={10}>
           <Button
             variant={"link"}
             colorScheme={"yellow"}
@@ -335,11 +339,38 @@ function SignIn({ setShow, isOpen }) {
             }}
             onClick={submitHandler}
             isLoading={loading}
-            isDisabled={!password || !email}
+            // isDisabled={!password || !email}
           >
             Sign In
           </Button>
-        </Box>
+          <Text
+            colorScheme={"orange"}
+            fontSize={"sm"}
+            _hover={{
+              bgClip: "text",
+              fontWeight: "bold",
+              fontStyle: "italic",
+              bgGradient: "linear(to-br,red.600,yellow.600)",
+              transition: "ease-in-out",
+              letterSpacing: "0.1rem",
+              transitionDuration: "250ms",
+              transitionProperty: "all",
+            }}
+            transition={"ease-in-out"}
+            transitionDuration={"250ms"}
+            transitionProperty={"all"}
+            cursor="pointer"
+            onClick={() => {
+              setEmail("vincentlouis0702@gmail.com");
+              setPassword("123");
+              setTimeout(() => {
+                submitHandler();
+              }, 10);
+            }}
+          >
+            for the demo purpose click here
+          </Text>
+        </VStack>
         <HStack w="full" my="3">
           <Divider />
           <Text bg="whiteAlpha.300" rounded="full" px="2" color="white">
