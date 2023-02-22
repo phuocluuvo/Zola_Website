@@ -15,7 +15,6 @@ import ChangeInfoForm from "../form/ChangeInfoForm";
 
 function ProfileModal({ user, children }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  console.log("ProfileModal is rendered");
   return (
     <>
       {children ? (

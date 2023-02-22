@@ -17,7 +17,6 @@ import {
 import React, { useState } from "react";
 import { ChatState } from "../../providers/ChatProvider";
 import UserListItem from "../list/items/UserListItem";
-import axios from "axios";
 import ChatLoading from "../loading/ChatLoading";
 import { accessToChat, searchChats } from "../../apis/chats.api";
 // const ENDPOINT = process.env.REACT_APP_PORT;

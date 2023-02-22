@@ -289,7 +289,6 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
   });
 
   useEffect(() => {
-    console.log("");
     socket.on("answer", (id) => {
       const win = window.open(
         "https://zolachatapp.netlify.app/call/" + id + "/" + id,

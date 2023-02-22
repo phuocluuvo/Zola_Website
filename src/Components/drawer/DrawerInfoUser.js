@@ -29,7 +29,7 @@ export default function DrawerInfoUser({ _user }) {
   const btnRef = React.useRef();
   const [pics, setPics] = useState([]);
   const [loading, setLoading] = useState(false);
-  const { selectedChat, user } = ChatState();
+  const { selectedChat } = ChatState();
   const [photoIndex, setPhotoIndex] = useState(1);
   const [openGallery, setOpenGallery] = useState(false);
   const toast = useToast();

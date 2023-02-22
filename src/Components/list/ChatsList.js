@@ -29,14 +29,24 @@ function ChatList({ fetchAgain, setFetchAgain }) {
         console.log("successfully aborted");
       } else {
         console.log(error);
+
         toast({
           title: "Error Occured",
-          description: "Failed to load chats",
+          description:
+            "Failed to load chats. Auto-refreshing in 2 seconds to fix the issue.",
           status: "error",
           duration: 2500,
           isClosable: true,
           position: "bottom-left",
         });
+        
+        setTimeout(() => {
+          window.location.reload();
+          return () => {
+            // cancel the request before component unmounts
+            source.cancel();
+          };
+        }, 2000);
       }
     }
     return () => {
@@ -56,7 +66,7 @@ function ChatList({ fetchAgain, setFetchAgain }) {
         console.log(error);
         toast({
           title: "Error Occured",
-          description: "Failed to load chats",
+          description: "Failed to load friends list",
           status: "error",
           duration: 2500,
           isClosable: true,
@@ -69,7 +79,6 @@ function ChatList({ fetchAgain, setFetchAgain }) {
       source.cancel();
     };
   };
-  console.log("chatList is rendered");
   return (
     <VStack zIndex={1} mb={5} spacing="0">
       {user

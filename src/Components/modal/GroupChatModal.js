@@ -136,7 +136,6 @@ function GroupChatModal({ children }) {
   const handleRemove = (userToRemove) => {
     setSelectedUsers(selectedUsers.filter((u) => u._id !== userToRemove._id));
   };
-  console.log("GroupChatModal is rendered");
   return (
     <>
       <Button

@@ -25,7 +25,6 @@ function UserBadgeItem({
   setFetchAgain,
   fetchAgain,
 }) {
-  console.log("UserBadgeItem is rendered");
   const { colorMode } = useColorMode();
   const bgColor = useColorModeValue(
     "radial-gradient( circle farthest-corner at 10% 20%,  rgba(255,229,168,1) 0%, rgba(251,174,222,1) 100.7% )",

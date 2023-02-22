@@ -35,8 +35,6 @@ function WelcomePage() {
     if (userInfo) navigator("/chats");
   }, [navigator]);
   const [show, setShow] = useState(false);
-  //Animation
-  console.log("WelcomePage is rendered");
   return (
     <div
       onMouseLeave={(e) => {

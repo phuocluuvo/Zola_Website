@@ -17,7 +17,6 @@ import {
 } from "@chakra-ui/react";
 import axios from "axios";
 import React, { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import { io } from "socket.io-client";
 import { getChats } from "../apis/chats.api";
 import { getSender, getSenderInfo } from "../logic/ChatLogic";
@@ -75,7 +74,6 @@ function SideBarClosed({ fetchAgain }) {
     fetchChats();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fetchAgain]);
-  console.log("SideBarClosed is rendered");
   return (
     <Box
       bgGradient={bg}

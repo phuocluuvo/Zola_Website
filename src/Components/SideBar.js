@@ -1,7 +1,6 @@
 import {
   Avatar,
   Box,
-  Button,
   IconButton,
   Menu,
   MenuButton,
@@ -11,12 +10,12 @@ import {
   useColorMode,
   useColorModeValue,
 } from "@chakra-ui/react";
-import { AddIcon, ViewIcon } from "@chakra-ui/icons";
-import React, { useState } from "react";
+import { ViewIcon } from "@chakra-ui/icons";
+import React from "react";
 import ChatList from "./list/ChatsList";
 import { ChatState } from "../providers/ChatProvider";
 
-import GroupChatModal from "./modal/GroupChatModal";
+import CreateGroupChatButton from "./button/CreateGroupChatButton";
 
 function SideBar({ fetchAgain, setFetchAgain }) {
   const bg = useColorModeValue(
@@ -31,7 +30,6 @@ function SideBar({ fetchAgain, setFetchAgain }) {
   const {
     setCloseSideBar,
     user,
-    selectedChat,
     setSelectedChat,
     notification,
     setNotification,
@@ -62,7 +60,7 @@ function SideBar({ fetchAgain, setFetchAgain }) {
             top={0}
             zIndex={10}
           >
-            {/**Avata user badge: colorLoggedUser, user,notification,colorMode,isOn */}
+            {/**Avata user badge: colorLoggedUser, user,notification */}
             <Box
               display="flex"
               w={{ base: "full", md: "fit-content" }}
@@ -154,17 +152,7 @@ function SideBar({ fetchAgain, setFetchAgain }) {
                 alignItems="center"
                 px="3"
               >
-                {/**Add group chat */}
-
-                <GroupChatModal>
-                  <Button
-                    display="flex"
-                    fontSize={{ base: "17px", md: "10px", lg: "17px" }}
-                    rightIcon={<AddIcon fontSize={"25px"} />}
-                  >
-                    New Group Chat
-                  </Button>
-                </GroupChatModal>
+                <CreateGroupChatButton />
               </Box>
             </Box>
             {/**view button */}

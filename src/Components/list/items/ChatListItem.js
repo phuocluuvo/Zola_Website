@@ -46,10 +46,11 @@ function ChatListItem({ chat, index, friends }) {
         key={index}
         className="transition-opacity pullRight"
         onClick={() => {
-          selectedChat
-            ? io(process.env.REACT_APP_PORT).emit("outchat", selectedChat._id)
-            : console.log("out r");
+          if (selectedChat)
+            io(process.env.REACT_APP_PORT).emit("outchat", selectedChat._id);
+          else console.log("out r");
           setSelectedChat(chat);
+          return;
         }}
         cursor="pointer"
         position="relative"

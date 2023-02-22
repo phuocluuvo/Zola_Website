@@ -14,7 +14,6 @@ function ChatPage() {
   const [fetchAgain, setFetchAgain] = useState(false); // cờ hiệu refresh tất cả nhưng thứ liên quan
   const isPresent = useIsPresent();
   const [display, setIsDisplay] = useState();
-  console.log("ChatPage is rendered");
   return (
     <ErrorBoundary>
       <div className=" max-w-[100vw] h-[100vh] flex flex-row p-0 relative overflow-hidden">
