@@ -34,6 +34,7 @@ import {
   addDoc,
 } from "firebase/firestore";
 import { EmailIcon } from "@chakra-ui/icons";
+import http from "../../utils/http";
 const ENDPOINT = process.env.REACT_APP_PORT;
 const firebaseConfig = {
   apiKey: process.env.REACT_APP_API_KEY,
@@ -215,8 +216,11 @@ function SignIn({ setShow, isOpen }) {
           const userInfo = JSON.parse(localStorage.getItem("userInfo"));
           setLoading(false);
           setUser(userInfo);
-          if(userInfo.token)
-          setTimeout(() => navigate("/chats"), 10);
+          if (userInfo.token)
+            if (http) navigate("/chats");
+            else {
+              window.location.reload();
+            }
         }
       }
       if (verify.data.verify === false) {

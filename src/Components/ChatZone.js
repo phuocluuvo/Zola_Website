@@ -290,7 +290,7 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
 
   useEffect(() => {
     socket.on("answer", (id) => {
-      const win = window.open(
+      window.open(
         "https://zolachatapp.netlify.app/call/" + id + "/" + id,
         "Call Video",
         "toolbar=yes,scrollbars=yes,resizable=yes,top=50,left=70,width=1200,height=600"
